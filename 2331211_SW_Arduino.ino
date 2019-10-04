@@ -5,11 +5,6 @@
 
 unsigned char buf[20];
 
-unsigned char opt_sensors;
-int incomingByte = 0;
-int loopCount = 0;
-char showTemp = 0, showHum = 0, showLight = 0, showSound = 0, degCorf = 0, showCO2 = 0, showVOC = 0, showPwr = 0, showEvents = 0;
-String sampPeriodTxt;
 
 float sampPeriod = 1;
 
