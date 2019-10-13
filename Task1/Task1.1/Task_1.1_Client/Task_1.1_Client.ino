@@ -1,11 +1,5 @@
 /*
- This example connects to an unencrypted Wifi network.
- Then it prints the MAC address of the board,
- the IP address obtained, and other network details.
- created 13 July 2010
- by dlf (Metodo2 srl)
- modified 31 May 2012
- by Tom Igoe
+modified form example Arduino Code
  */
 #include <SPI.h>
 #include <WiFiNINA.h>
@@ -18,7 +12,6 @@ int status = WL_IDLE_STATUS;     // the Wifi radio's status
 WiFiClient client;
 char server_ip[] = {192,168,4,1};
 int server_port = 23;
-int led = LED_BUILTIN;
 int test = 0;
 void setup() {
   //Initialize serial and wait for port to open:
@@ -63,9 +56,6 @@ void loop() {
     Serial.println("data sent to server");
     Serial.print("value sent: ");
     Serial.println(test);
-    if(!client.connected()){
-    Serial.println("disconnected");
-    }
   }
   while (status != WL_CONNECTED) {
     Serial.print("Attempting to connect to open SSID: ");
