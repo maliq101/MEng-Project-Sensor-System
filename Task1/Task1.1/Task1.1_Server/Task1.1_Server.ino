@@ -1,19 +1,5 @@
 /*
-  WiFi Web Server LED Blink
-
-  A simple web server that lets you blink an LED via the web.
-  This sketch will create a new access point (with no password).
-  It will then launch a new server and print out the IP address
-  to the Serial monitor. From there, you can open that address in a web browser
-  to turn on and off the LED on pin 13.
-
-  If the IP address of your board is yourAddress:
-    http://yourAddress/H turns the LED on
-    http://yourAddress/L turns it off
-
-  created 25 Nov 2012
-  by Tom Igoe
-  adapted to WiFi AP by Adafruit
+Code modified from Example Arduino Code
  */
 
 #include <SPI.h>
@@ -24,8 +10,6 @@ char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                // your network key Index number (needed only for WEP)
 
-int led =  LED_BUILTIN;
-bool client_led=0;
 int status = WL_IDLE_STATUS;
 WiFiServer server(23);
 
@@ -37,8 +21,6 @@ void setup() {
   }
 
   Serial.println("Access Point Web Server");
-
-  pinMode(led, OUTPUT);      // set the LED pin mode
 
   // check for the WiFi module:
   if (WiFi.status() == WL_NO_MODULE) {
@@ -92,6 +74,7 @@ void loop() {
       Serial.println("Device disconnected from AP");
     }
   }
+  
   WiFiClient client = server.available();
   if (client.connected()) {                             // if you get a client,
     Serial.println("new client");           // print a message out the serial port
