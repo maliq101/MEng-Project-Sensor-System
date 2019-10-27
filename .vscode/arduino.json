@@ -1,0 +1,6 @@
+{
+    "programmer": "ArduinoISP",
+    "board": "arduino:samd:mkrwifi1010",
+    "sketch": "Task1\\Task1.1\\Task1.1_Server\\Task1.1_Server.ino",
+    "port": "COM6"
+}
