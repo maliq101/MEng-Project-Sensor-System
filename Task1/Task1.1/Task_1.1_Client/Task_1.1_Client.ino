@@ -1,5 +1,4 @@
 /*
-modified form example Arduino Code
  */
 #include <SPI.h>
 #include <WiFiNINA.h>
@@ -11,8 +10,10 @@ int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 WiFiClient client;
 char server_ip[] = {192,168,4,1};
-int server_port = 23;
+int server_port = 80;
+int led = LED_BUILTIN;
 int test = 0;
+byte send_mac[6];
 void setup() {
   //Initialize serial and wait for port to open:
   pinMode(led, OUTPUT);       //set the LED pin mode
@@ -52,10 +53,19 @@ void loop() {
 //Connect to server
   Serial.println("Connecting to Server");
   if(client.connect({192,168,4,1},server_port)){
+    //send mac address
+    WiFi.macAddress(send_mac);
+      for (int i = 5; i >= 0; i--) {
+    client.print(send_mac[i]);
+    Serial.print(send_mac[i]);
+  }
     client.println(test);
     Serial.println("data sent to server");
     Serial.print("value sent: ");
     Serial.println(test);
+    if(!client.connected()){
+    Serial.println("disconnected");
+    }
   }
   while (status != WL_CONNECTED) {
     Serial.print("Attempting to connect to open SSID: ");
@@ -67,7 +77,7 @@ void loop() {
   }
   test++;
   //printCurrentNet();
-  delay(2000);
+  delay(10000);
 }
 
 void printWifiData() {
