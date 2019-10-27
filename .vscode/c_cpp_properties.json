@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:\\Users\\Maliq\\Documents\\Arduino\\libraries\\WiFiNINA\\src",
+                "C:\\Users\\Maliq\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\libraries\\SPI",
+                "C:\\Users\\Maliq\\AppData\\Local\\Arduino15\\packages\\arduino\\tools\\**",
+                "C:\\Users\\Maliq\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
+                "C:\\Program Files (x86)\\Arduino\\libraries\\**",
+                "C:\\Users\\Maliq\\Documents\\Arduino\\libraries\\**"
+            ],
+            "forcedInclude": [
+                "C:\\Users\\Maliq\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\cores\\arduino\\Arduino.h"
+            ],
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}
