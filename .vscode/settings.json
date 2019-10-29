@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "*.ino": "arduino-output",
+        "*.ino": "c",
         "spi.h": "c",
         "arduino_secrets.h": "c",
         "wifiudp.h": "c",
