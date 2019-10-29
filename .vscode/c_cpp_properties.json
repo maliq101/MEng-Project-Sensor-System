@@ -3,6 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
+                "E:\\Uni\\Arduino\\libraries\\ArduinoHttpClient\\src",
                 "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.3\\libraries\\SPI",
                 "C:\\Users\\Maliq\\Documents\\Arduino\\libraries\\ArduinoHttpClient\\src",
                 "E:\\Uni\\Arduino\\libraries\\WiFiNINA\\src",
@@ -14,11 +15,11 @@
                 "C:\\Program Files (x86)\\Arduino\\libraries\\**",
                 "C:\\Users\\Maliq\\Documents\\Arduino\\libraries\\**",
                 "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.3\\**",
-                "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\tools\\**"
+                "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\tools\\**",
+                "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\**"
             ],
             "forcedInclude": [
-                "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.3\\cores\\arduino\\Arduino.h",
-                "C:\\Users\\Maliq\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\cores\\arduino\\Arduino.h"
+                "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\cores\\arduino\\Arduino.h"
             ],
             "intelliSenseMode": "msvc-x64"
         }
