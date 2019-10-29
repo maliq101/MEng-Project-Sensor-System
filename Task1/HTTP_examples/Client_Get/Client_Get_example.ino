@@ -1,6 +1,6 @@
+
 /*
-  Simple GET client for ArduinoHttpClient library
-  Connects to server once every five seconds, sends a GET request
+Simple Program that sends a Get Request to the arduion server using HTTP
  */
 #include <ArduinoHttpClient.h>
 #include <WiFiNINA.h>
@@ -12,10 +12,10 @@ char ssid[] = SECRET_SSID;
 char pass[] = SECRET_PASS;
 
 char serverAddress[] = "192.168.4.1";  // server address
-int port = 8080;
+int port = 80;//port number for HTTP
 
 WiFiClient wifi;
-HttpClient client = HttpClient(wifi, serverAddress, port);
+HttpClient client = HttpClient(wifi, serverAddress, port);//create http client which connects to server wifi
 int status = WL_IDLE_STATUS;
 
 void setup() {
@@ -40,7 +40,7 @@ void setup() {
 
 void loop() {
   Serial.println("making GET request");
-  client.get("/");
+  client.get("/");//sends empty get request to server host (using ip address)
 
   // read the status code and body of the response
   int statusCode = client.responseStatusCode();
