@@ -1,6 +1,6 @@
 {
     "programmer": "AVR ISP",
-    "board": "arduino:samd:mkrwifi1010",
+    "board": "arduino:samd:mkrwifi1010,
     "sketch": "Task1\\HTTP_examples\\Client_Get\\Client_Get_example.ino",
     "port": "COM3"
 }
