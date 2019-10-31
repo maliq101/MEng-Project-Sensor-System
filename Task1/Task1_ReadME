@@ -7,6 +7,5 @@ Task 1.1 allows int, float, char and string data transfer between arduino server
 This code uses http protocol via two http libaries. Client initiates communciation with server
 PUT request writes to server and GET reads from server
 
-Task 1.2 adds on 1.1 and allows a web client to read data from arduion server using html
-
-Full Describtion will be availble after completion
+Task 1.2 adds on 1.1 and allows a web client to read data from arduion server using html.
+By changing the URL entered into the browser, you can select which variable to show
