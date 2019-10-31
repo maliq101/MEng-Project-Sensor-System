@@ -1,7 +1,6 @@
 /*
-Simple Program that sends a Put Request to the arduion server using HTTP
-Send a single data variable to the server 
-
+Simple Program that sends a PUT Request to the arduino server using HTTP
+Code works with Server_PUT_GET program, and sends test string, int, float and char variables
  */
 #include <ArduinoHttpClient.h>
 #include <WiFiNINA.h>
@@ -18,9 +17,13 @@ int port = 80;//port number for HTTP
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, serverAddress, port);//create http client which connects to server wifi
 int status = WL_IDLE_STATUS;
-String test_string="abcd";
-char test_char[]={0,1,2,3};
+
+//test variables used for PUT testing
+String test_string="test data from client";//strng
+char test_char[]={48,49,50,51};//[0,1,2,3] in ascii
 float test_float=3.142; 
+int test_int=100;
+
 void setup() {
   Serial.begin(9600);
   while ( status != WL_CONNECTED) {
@@ -44,7 +47,7 @@ void setup() {
 void loop() {
   Serial.println("making PUT request");
   String contentType = "text/plain";
-  String putData = test_string;
+  String putData = String("String:"+ test_string + "\n" + "int:" + test_int + "\n"  + "float:" + test_float + "\n" + "test_char_array:" + test_char[2]);
 
   client.put("/", contentType, putData);
 

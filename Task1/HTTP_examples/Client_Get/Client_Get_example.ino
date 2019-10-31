@@ -40,7 +40,7 @@ void setup() {
 
 void loop() {
   Serial.println("making GET request");
-  client.get("/");//sends empty get request to server host (using ip address)
+  client.get("/test/url");//sends empty get request to server host (using ip address)
 
   // read the status code and body of the response
   int statusCode = client.responseStatusCode();
