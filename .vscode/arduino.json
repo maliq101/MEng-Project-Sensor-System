@@ -1,4 +1,6 @@
 {
     "programmer": "AVR ISP",
     "board": "arduino:samd:mkrwifi1010",
+    "port": "COM6",
+    "sketch": "Task1\\Task 1.2\\Server 1.2\\Server_Get_Put1.2.ino"
 }
