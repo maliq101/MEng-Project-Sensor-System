@@ -150,12 +150,12 @@ String response_body(String url){//function selects correct response body, depen
     return String("float " + String(test_float,3));
     }
   else if (url=="string"){
-    return String("String" + test_string);
+    return String("string" + test_string);
     }
   else if (url==""){
-    return String("successful connection:\nEnter the following URL to read Server data, i.e. http://192.168.4.1/all \n/all: for all varables \n/int: for int \n/String: for string \n/float: for float");
+    return String("Successful connection:\nEnter the following URL to read Server data, i.e. http://192.168.4.1/all \n/all: for all varables \n/int: for int \n/String: for string \n/float: for float");
     } 
   else{
-    return String("incorrect URL. Enter http://192.168.4.1 to go back" );
+    return String("Incorrect URL. Enter http://192.168.4.1 to go back" );
   }
 }
