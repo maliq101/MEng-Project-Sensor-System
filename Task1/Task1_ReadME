@@ -1,3 +1,6 @@
 This Folder contains the server and client code required to coomplete task1.
 To establish communication between 2 ardunion MKR 1010 boards over WiFi.
+
+Task 1.0 established basic comminucation between an arduno server and arduino client without the use of a protocol
+Task 1.1
 Full Describtion will be availble after completion
