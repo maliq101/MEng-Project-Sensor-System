@@ -1,0 +1,5 @@
+This Folder Contains the code written for task 2
+Task 2 is to acheive a 2 sensor 1 server system
+The sensors will periodically measure the room paramaters and update the server with new measurements
+The server will store the measured data, create the wifi network and allow retrival via a web browser
+
