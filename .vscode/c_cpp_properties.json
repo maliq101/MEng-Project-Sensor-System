@@ -3,6 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
+                "E:\\Uni\\Arduino\\libraries\\ArduinoHttpServer\\src",
                 "C:\\Users\\Maliq\\Documents\\Arduino\\libraries\\ArduinoHttpServer\\src",
                 "E:\\Uni\\Arduino\\libraries\\ArduinoHttpClient\\src",
                 "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.3\\libraries\\SPI",
@@ -20,7 +21,7 @@
                 "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\**"
             ],
             "forcedInclude": [
-                "C:\\Users\\Maliq\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\cores\\arduino\\Arduino.h"
+                "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\cores\\arduino\\Arduino.h"
             ],
             "intelliSenseMode": "msvc-x64"
         }
