@@ -3,6 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
+                "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\libraries\\Wire",
                 "E:\\Uni\\Arduino\\libraries\\ArduinoHttpServer\\src",
                 "C:\\Users\\Maliq\\Documents\\Arduino\\libraries\\ArduinoHttpServer\\src",
                 "E:\\Uni\\Arduino\\libraries\\ArduinoHttpClient\\src",
