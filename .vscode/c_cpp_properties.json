@@ -3,6 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
+                "E:\\Uni\\Arduino\\libraries\\SD\\src",
+                "E:\\Uni\\Arduino\\libraries\\RTCZero\\src",
                 "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\libraries\\Wire",
                 "E:\\Uni\\Arduino\\libraries\\ArduinoHttpServer\\src",
                 "C:\\Users\\Maliq\\Documents\\Arduino\\libraries\\ArduinoHttpServer\\src",
