@@ -1,7 +1,8 @@
 /*
 Sensor sends data using PUT HTTP Reuest over Wifi.
 Data briefly stored in struct 
-permanent storage in csv fil on sd card
+Permanent storage in csv file on sd card
+RTC functionallity added 
 
 */
 
@@ -28,6 +29,8 @@ struct
   unsigned int light;
   unsigned int co2;
   unsigned int voc;
+  String pir_event;
+  String motion_event;
 }current_sensor;
 String response_body;//used for sending reponse body
 
@@ -35,13 +38,18 @@ RTCZero rtc;//create an rtc object
 const byte seconds = 20;
 const byte minutes = 59;
 const byte hours = 23;
-const byte day = 31;
+const byte day = 19;
 const byte month = 12;
 const byte year = 19;
 
 const int chipSelect = 4;
 File file;
 void setup() {
+  //GPIO
+  pinMode(0,OUTPUT);//commuication with server
+  pinMode(2,OUTPUT);//RED
+  pinMode(3,OUTPUT);//commicating with sensor
+  pinMode(5,OUTPUT);//RED
   //Serial
   Serial.begin(9600);  //Initialize serial and wait for port to open:
   //RTC
@@ -50,7 +58,7 @@ void setup() {
   rtc.setDate(day,month,year);
   //SD
   if (!SD.begin(4)) {
-    Serial.println("initialization failed!");
+    Serial.println("SD initialization failed!");
     while (1);
   }
 
@@ -98,24 +106,18 @@ void setup() {
   current_sensor.humidity=12.5;
   current_sensor.co2=80;
   
-  Serial.println("Creating csv files for sensors")
+  Serial.println("Creating csv files for sensors");
   create_file("sensor1.csv");
-  create_file("sensor2.csv")
-  Serial.println("Saving data to SD");
-  store_data();
-  delay(2000);
-  current_sensor.temperature++;
-  current_sensor.humidity--;
-  Serial.println("Saving data to SD");
-  store_data();
-  
+  create_file("sensor2.csv");
 }
 
 void loop()
 {
+  digitalWrite(0,LOW);
   WiFiClient client( server.available() );//making a wifi client called client
   if (client.connected())
   {
+    digitalWrite(0,HIGH);
     ArduinoHttpServer::StreamHttpRequest<1023> httpRequest(client);// Connected to client. Allocate and initialize StreamHttpRequest object.
 
     
@@ -127,7 +129,8 @@ void loop()
 
         ArduinoHttpServer::StreamHttpReply httpReply(client,httpRequest.getContentType());//create http reply object
         if( method == ArduinoHttpServer::MethodGet )//GET request from web client
-        {
+        {   
+            digitalWrite(2,HIGH);
             //Print URL request from client
             Serial.println("GET Request Received from Web browser");
             Serial.print("data varable selected: ");
@@ -136,18 +139,24 @@ void loop()
             //send requested data
             response_body= get_response(httpRequest.getResource()[0]);//response body chosen by URL sent using response_bodyt function
             httpReply.send(response_body);
+            digitalWrite(2,LOW);
          }
          else if( method == ArduinoHttpServer::MethodPut )//Put Request. print recieved data
          {
+           digitalWrite(5,HIGH);
            Serial.println("PUT Request Received");
            current_sensor.number = httpRequest.getResource()[0].toInt();//sensor number used for determing what file to store data in
            current_sensor.data_url = httpRequest.getResource()[1];
            current_sensor.body_string = httpRequest.getBody();//retreive the end of url determining data sent by sensor
            buffer_data();//retreive measured data from body string and store it in buffer struct
-           store_data();//function stores temporary data stored in sturct to permenant file in SD card
-          //print recieved data and send ok http repsonse to client
            response_body="Data Received by Server";//
            httpReply.send(response_body); //send ok status
+           Serial.println("Recieved PUT String Body: ");
+           Serial.println(current_sensor.body_string);
+           store_data();//function stores temporary data stored in sturct to permenant file in SD card
+          //print recieved data and send ok http repsonse to client
+          digitalWrite(5,LOW);
+
          }
          else{
            Serial.println("Neither GET or PUT");
@@ -190,26 +199,40 @@ void buffer_data(void){//retrieve data sent by sensor and store it in buffer str
   String data1=current_sensor.body_string;
   String data2=data1;
   String temp;
-  
   temp= data1.substring(0,data2.indexOf("\n"));
   current_sensor.temperature = temp.toFloat();
   int length = temp.length();
+  length++;
   
-  temp = data1.substring(length+1,data2.indexOf("\n",length+1));
+  temp = data1.substring(length,data2.indexOf("\n",length));
   current_sensor.humidity = temp.toFloat();
   length += temp.length();
+  length++;
 
-  temp = data1.substring(length+1,data2.indexOf("\n",length+1));
+  temp = data1.substring(length,data2.indexOf("\n",length));
   current_sensor.co2 = temp.toInt();
   length += temp.length();
+  length++;
 
-
-  temp = data1.substring(length+1,data2.indexOf("\n",length+1));
+  temp = data1.substring(length,data2.indexOf("\n",length));
   current_sensor.light = temp.toInt();
   length += temp.length();
+  length++;
+
+  temp = data1.substring(length,data2.indexOf("\n",length));
+  current_sensor.pir_event = temp;
+  length += temp.length();
+  length++;
+
+  temp = data1.substring(length,data2.indexOf("\n",length));
+  current_sensor.motion_event = temp;
+  length += temp.length();
+  length++;
+  
 }
 void store_data(void){
-  String filename;
+  digitalWrite(3,HIGH);
+  String filename ="";
   String data = "";
   switch (current_sensor.number)
   {
@@ -219,11 +242,12 @@ void store_data(void){
   case 2://data recieved from sensor 2
     filename="sensor2.csv"; 
   default:
+    filename= "no file selected";
     break;
   }
   Serial.print("File Selected: ");
   Serial.println(filename);
-  data = String(rtc.getDay()) + "/" + String(rtc.getMonth()) + "/" + String(rtc.getYear()) + ","+ String(rtc.getHours()) + ":" + String(rtc.getMinutes()) + ":" + String(rtc.getSeconds()) + "," + String(current_sensor.temperature) + "," + String(current_sensor.humidity) + "," + String(current_sensor.light) + "," + String(current_sensor.co2) + "," + String(current_sensor.voc);
+  data = String(rtc.getDay()) + "/" + String(rtc.getMonth()) + "/" + String(rtc.getYear()) + ","+ String(rtc.getHours()) + ":" + String(rtc.getMinutes()) + ":" + String(rtc.getSeconds()) + "," + String(current_sensor.temperature) + "," + String(current_sensor.humidity) + "," + String(current_sensor.co2) + "," + String(current_sensor.light) + "," + current_sensor.pir_event + "," + current_sensor.motion_event;
   Serial.print("Date to be written to SD: " );
   Serial.println(data);
   file=SD.open(filename,FILE_WRITE);
@@ -234,6 +258,7 @@ void store_data(void){
   else{//Error
     Serial.println("Error writing data to file");
   }
+  digitalWrite(3,LOW);
 }
 void create_file(String filename){//function creates a file and adds the table header if required
   char data_on_file;//used to test first char in file
@@ -250,7 +275,7 @@ void create_file(String filename){//function creates a file and adds the table h
         Serial.println("Headers exist. ");
       }
       else{//no header
-        file.println("Date,Time,Temperature(Celcius),Humiditiy(percent),Light(),CO2(ppm),VOC(ppm)");
+        file.println("Date,Time,Temperature(Celcius),Humiditiy(percent),CO2(ppm),Light,PIR Event,Motion Event");
         Serial.println("Headers did not existed. Added Headers");
       }
       file.close();
@@ -263,7 +288,7 @@ void create_file(String filename){//function creates a file and adds the table h
     file=SD.open(filename,FILE_WRITE);
       if(file){//file opened Successful
         Serial.println("File did not exist, File Created");
-        file.println("Date,Time,Temperature(Celcius),Humiditiy(percent),Light(),CO2(ppm),VOC(ppm)");
+        file.println("Date,Time,Temperature(Celcius),Humiditiy(percent),CO2(ppm),Light,PIR Event,Motion Event");
         file.close();
       }
       else{
