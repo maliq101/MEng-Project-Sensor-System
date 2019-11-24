@@ -21,8 +21,7 @@ int wifi_status = WL_IDLE_STATUS;
 
 struct 
 {
-  int number;
-  String data_url;
+  String number;
   String body_string;
   float temperature;
   float humidity;
@@ -33,6 +32,17 @@ struct
   String motion_event;
 }current_sensor;
 String response_body;//used for sending reponse body
+
+struct last_contact_time
+{
+  byte seconds = 20;
+  byte minutes = 59;
+  byte hours = 23;
+  byte day = 19;
+  byte month = 12;
+  byte year = 19;
+}sensor1,sensor2;
+
 
 RTCZero rtc;//create an rtc object
 const byte seconds = 20;
@@ -45,11 +55,6 @@ const byte year = 19;
 const int chipSelect = 4;
 File file;
 void setup() {
-  //GPIO
-  pinMode(0,OUTPUT);//commuication with server
-  pinMode(2,OUTPUT);//RED
-  pinMode(3,OUTPUT);//commicating with sensor
-  pinMode(5,OUTPUT);//RED
   //Serial
   Serial.begin(9600);  //Initialize serial and wait for port to open:
   //RTC
@@ -61,6 +66,11 @@ void setup() {
     Serial.println("SD initialization failed!");
     while (1);
   }
+    //GPIO
+  pinMode(0,OUTPUT);//RED Communication with sensor via wifi
+  pinMode(2,OUTPUT);//green GET request
+  pinMode(3,OUTPUT);//red PUT request
+ // pinMode(5,OUTPUT);//RED
 
 
   //Wifi
@@ -99,13 +109,7 @@ void setup() {
 
   delay(10000);// wait 10 seconds for connection:
   server.begin();// start the web server on port 80
-  printWiFiStatus();// you're connected now, so print out the status
-  current_sensor.number=1;
-  current_sensor.temperature=100;
-  current_sensor.light=50;
-  current_sensor.humidity=12.5;
-  current_sensor.co2=80;
-  
+  printWiFiStatus();// you're connected now, so print out the status  
   Serial.println("Creating csv files for sensors");
   create_file("sensor1.csv");
   create_file("sensor2.csv");
@@ -143,10 +147,9 @@ void loop()
          }
          else if( method == ArduinoHttpServer::MethodPut )//Put Request. print recieved data
          {
-           digitalWrite(5,HIGH);
+           digitalWrite(3,HIGH);
            Serial.println("PUT Request Received");
-           current_sensor.number = httpRequest.getResource()[0].toInt();//sensor number used for determing what file to store data in
-           current_sensor.data_url = httpRequest.getResource()[1];
+           current_sensor.number = httpRequest.getResource()[0];//sensor number used for determing what file to store data in
            current_sensor.body_string = httpRequest.getBody();//retreive the end of url determining data sent by sensor
            buffer_data();//retreive measured data from body string and store it in buffer struct
            response_body="Data Received by Server";//
@@ -154,8 +157,9 @@ void loop()
            Serial.println("Recieved PUT String Body: ");
            Serial.println(current_sensor.body_string);
            store_data();//function stores temporary data stored in sturct to permenant file in SD card
+           update_sensor_last_contact_time();//update the last confirmed Communication time for the current_sensor
           //print recieved data and send ok http repsonse to client
-          digitalWrite(5,LOW);
+          digitalWrite(3,LOW);
 
          }
          else{
@@ -168,6 +172,9 @@ void loop()
          ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
          httpReply.send(httpRequest.getErrorDescrition());
       }
+   client.stop();
+   check_sensor_last_contact_time(1);//check to see if any sensors have been disconnected
+   check_sensor_last_contact_time(2);
    }
 
 }
@@ -231,16 +238,17 @@ void buffer_data(void){//retrieve data sent by sensor and store it in buffer str
   
 }
 void store_data(void){
-  digitalWrite(3,HIGH);
   String filename ="";
   String data = "";
-  switch (current_sensor.number)
+  int sensor_number = current_sensor.number.toInt();
+  switch (sensor_number)
   {
   case 1://data recieved from sensor 1
     filename="sensor1.csv";
     break;
   case 2://data recieved from sensor 2
     filename="sensor2.csv"; 
+    break;
   default:
     filename= "no file selected";
     break;
@@ -258,7 +266,6 @@ void store_data(void){
   else{//Error
     Serial.println("Error writing data to file");
   }
-  digitalWrite(3,LOW);
 }
 void create_file(String filename){//function creates a file and adds the table header if required
   char data_on_file;//used to test first char in file
@@ -329,4 +336,72 @@ void print2digits(int number) {
     Serial.print("0"); // print a 0 before if the number is < than 10
   }
   Serial.print(number);
+}
+void update_sensor_last_contact_time(void){
+    int sensor_number = current_sensor.number.toInt();
+    //select currect last_contact struct
+    switch (sensor_number)
+    {
+    case 1:
+      sensor1.seconds=rtc.getSeconds();
+      sensor1.minutes=rtc.getMinutes();
+      sensor1.hours=rtc.getHours();
+      sensor1.day=rtc.getDay();
+      sensor1.month=rtc.getMonth();
+      sensor1.year=rtc.getYear();
+      break;
+    case 2:
+      sensor2.seconds=rtc.getSeconds();
+      sensor2.minutes=rtc.getMinutes();
+      sensor2.hours=rtc.getHours();
+      sensor2.day=rtc.getDay();
+      sensor2.month=rtc.getMonth();
+      sensor2.year=rtc.getYear();
+      break;
+    default:
+      break;
+    }
+  Serial.println("Last contact time of Sensor" + String(sensor_number) + " has been updated");
+}
+void check_sensor_last_contact_time(int sensor_number){
+  signed int last_minute;//last Successful Communication minute
+  signed int current_minute=rtc.getMinutes();
+  signed int temp;
+  switch (sensor_number)
+  {
+  case 1:
+    last_minute=sensor1.minutes;
+    break;
+  case 2:
+    last_minute=sensor2.minutes;
+    break;
+  default:
+    break;
+  }
+  Serial.print("Contact status of Sensor " + String(sensor_number));
+  if((current_minute<1)&&(last_minute>1)){
+    //acounting for minute overflow
+    temp=current_minute+60;
+  }
+  else{
+    temp=current_minute;
+  }
+  if(((temp-last_minute)<=2)&&((temp-last_minute)>=0)){
+    Serial.println(": OK");   
+  }
+  else{
+    //lost contact with sensor
+    Serial.println(": Lost contact");
+    switch (sensor_number)
+    {
+      case 1:
+        Serial.println("Last Successful contact at: " + String(sensor1.day) + "/" + String(sensor1.month) + "/" + String(sensor1.year) + "   "+ String(sensor1.hours) + ":" + String(sensor1.minutes) + ":" + String(sensor1.seconds));
+        break;
+      case 2:
+        Serial.println("Last Successful contact at: " + String(sensor2.day) + "/" + String(sensor2.month) + "/" + String(sensor2.year) + "   "+ String(sensor2.hours) + ":" + String(sensor2.minutes) + ":" + String(sensor2.seconds));
+        break;
+      default:
+        break;
+    }
+  }
 }
