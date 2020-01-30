@@ -4,6 +4,7 @@
         "spi.h": "c",
         "arduino_secrets.h": "c",
         "wifiudp.h": "c",
-        "wifinina.h": "c"
+        "wifinina.h": "c",
+        "arduinohttpclient.h": "c"
     }
 }

@@ -32,6 +32,7 @@ struct
   String motion_event;
 }current_sensor;
 String response_body;//used for sending reponse body
+String http_content_type;//used to determine http reply content type. csv for file downloads or html
 
 struct last_contact_time
 {
@@ -131,7 +132,7 @@ void loop()
        ArduinoHttpServer::MethodEnum method( ArduinoHttpServer::MethodInvalid );
        method = httpRequest.getMethod();
 
-        ArduinoHttpServer::StreamHttpReply httpReply(client,httpRequest.getContentType());//create http reply object
+        
         if( method == ArduinoHttpServer::MethodGet )//GET request from web client
         {   
             digitalWrite(2,HIGH);
@@ -142,11 +143,13 @@ void loop()
 
             //send requested data
             response_body= get_response(httpRequest.getResource()[0]);//response body chosen by URL sent using response_bodyt function
+            ArduinoHttpServer::StreamHttpReply httpReply(client,http_content_type);//create http reply object
             httpReply.send(response_body);
             digitalWrite(2,LOW);
          }
          else if( method == ArduinoHttpServer::MethodPut )//Put Request. print recieved data
          {
+           ArduinoHttpServer::StreamHttpReply httpReply(client,"text/plain");//create http reply object
            digitalWrite(3,HIGH);
            Serial.println("PUT Request Received");
            current_sensor.number = httpRequest.getResource()[0];//sensor number used for determing what file to store data in
@@ -178,25 +181,46 @@ void loop()
    }
 
 }
-String get_response(String url){//function selects correct response body, dependant on the full request URL
-  if(url=="all"){
-    //send all data varables
-    return String("String: ");
+String get_response(String url_1){//function selects correct response body, dependant on the full request URL
+  String download_file="";
+  String body="";
+  char data_on_file;
+  if(url_1=="sensor1"){
+    http_content_type="text/html";
+    body="<p>page will show information on sensor1 </p>";
+    body+="<p><a href = \'/sensor1.csv\' target= '_blank'> Click here to download file </a></p>";
+    body+="<p><a href = \''> Click here to go back to homepage</a></p>";
+    return body;
   }
-  else if (url=="int"){
-    return String("int: ");
+  else if (url_1=="sensor1.csv"){
+    http_content_type="text/csv";
+    file=SD.open("sensor1.csv");
+    if(file){
+      while(file.available()){
+        data_on_file=file.read();
+        download_file.concat(String(data_on_file));
+      }
     }
-  else if (url=="float"){
-    return String("float " );
+    return download_file;
     }
-  else if (url=="string"){
+  else if (url_1=="faults"){
+    http_content_type="text/html";
+    return String("This Page will show system faults i.e. lost connection with sensor" );
+    }
+  else if (url_1=="string"){
+    http_content_type="text/html";
     return String("string" );
     }
-  else if (url==""){
-    return String("Successful connection:\nEnter the following URL to read Server data, i.e. http://192.168.4.1/all \n/all: for all varables \n/int: for int \n/String: for string \n/float: for float");
+  else if (url_1==""){
+    http_content_type="text/html";
+    body="<p>Hompage with links to each sensor in html. will also show latest measurements for each sensor</p>" ;
+    body+="<p><a href = \'/sensor1\'> Click here for sensor 1 information</a></p>";
+    body+="<p><a href = \'/faults\'> Click here for faults </a></p>" ;
+    return body;
     } 
   else{
-    return String("Incorrect URL. Enter http://192.168.4.1 to go back" );
+    http_content_type="text/html";
+    return String("Incorrect URL.");
   }
 }
 void buffer_data(void){//retrieve data sent by sensor and store it in buffer struct
@@ -316,6 +340,21 @@ void printWiFiStatus() {
   // print where to go in a browser:
   Serial.print("To see this page in action, open a browser to http://");
   Serial.println(ip);
+
+  Serial.print("MAC Address:" );
+  byte mac[6];
+  WiFi.macAddress(mac);
+  for (int i = 5; i >= 0; i--) {
+    if (mac[i] < 16) {
+      Serial.print("0");
+    }
+  Serial.print(mac[i], HEX);
+    if (i > 0) {
+      Serial.print(":");
+    }
+  }
+  Serial.println();
+
 }
 void print_date(void){
   print2digits(rtc.getDay());
