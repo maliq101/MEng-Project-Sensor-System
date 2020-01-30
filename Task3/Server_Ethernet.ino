@@ -12,7 +12,7 @@ DHCP exmaple code used to request ip adderess and repeatedly renew it vias Ether
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
 byte mac[] = {
-  0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02
+  0x84, 0x0D, 0x8E, 0x34, 0x22, 0xB9
 };
 byte DHCP_ip_status;//used to check ip renewal status from DHCP
 EthernetServer server(80);//create a server listinng for connections via HTTP (port 80) 
