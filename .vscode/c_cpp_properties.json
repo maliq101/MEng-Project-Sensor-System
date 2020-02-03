@@ -3,6 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
+                "E:\\Uni\\Arduino\\libraries\\Arduino_Low_Power\\src",
                 "E:\\Uni\\Arduino\\libraries\\MsTimer2",
                 "E:\\Uni\\Arduino\\libraries\\SD\\src",
                 "E:\\Uni\\Arduino\\libraries\\RTCZero\\src",

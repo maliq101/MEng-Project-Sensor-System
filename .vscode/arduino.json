@@ -2,5 +2,5 @@
     "programmer": "AVR ISP",
     "board": "arduino:samd:mkrwifi1010",
     "port": "COM8",
-    "sketch": "Semester 2\\WB1\\Server\\Server_v1.ino"
+    "sketch": "Semester 2\\WB1\\Sensor\\Sensor_Client_v2.ino"
 }

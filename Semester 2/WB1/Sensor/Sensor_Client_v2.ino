@@ -12,7 +12,7 @@ YELLOW=SCL
 BLUE=SDA
 
 */
-
+#include <ArduinoLowPower.h>
 #include <ArduinoHttpClient.h>
 #include <WiFiNINA.h>
 #include "arduino_secrets.h"
@@ -33,17 +33,17 @@ int http_status_code = client.responseStatusCode();
 String http_response = client.responseBody();
 String http_content_type;
 String http_put_data;
-String sensor_number = "/2";//sensor number sent as http url
+String sensor_number = "/1";//sensor number sent as http url
 
 
 //variables for sensor 
 unsigned sensor_buf[20];//buffer used to retrive raw data from sensorf
-float temperature, humidity;
+float temperature, humidity,bat_volt;
 unsigned int sensor_status,light,co2_ppm,voc_ppm;
 String pir_event="";
 String motion_event="";
 
-int sample_time=10000;//5 seconds
+int sample_time=15000;//15 seconds
 
 void setup() {
   Serial.begin(9600);
@@ -51,8 +51,6 @@ void setup() {
   pinMode(2,OUTPUT);//RED
   pinMode(3,OUTPUT);//commicating with sensor
   pinMode(5,OUTPUT);//RED
-  //attachInterrupt(digitalPinToInterrupt(6), event_out, HIGH);
-
   Wire.begin();//begin i2c commincation for sensor
   connect_to_wifi();
 
@@ -125,6 +123,7 @@ void read_sensor(void){
   temperature = (sensor_buf[1] * 256.0 + sensor_buf[2]) / 10.0;
   humidity = (sensor_buf[3] * 256.0 + sensor_buf[4]) / 10.0;
   light = (sensor_buf[5] * 256.0 + sensor_buf[6]);
+  bat_volt = ((sensor_buf[9] * 256.0 + sensor_buf[10]) / 1024.0) * (3.3 / 0.330);
   co2_ppm = (sensor_buf[11] * 256.0 + sensor_buf[12]);
   voc_ppm = (sensor_buf[13] * 256.0 + sensor_buf[14]);
   if (sensor_status & 0x80){
@@ -147,7 +146,7 @@ void put_request(String data){
     http_put_data = String("Temperature (Celsius): " + String(temperature) + "\n" + "Humidtiy:" + String(humidity) + "\n"  + "co2 (ppm)" + String(co2_ppm) + "\n" + "Light:" + String(light));
   }
   else if(data == "data"){
-    http_put_data = String(String(temperature) + "\n" + String(humidity) + "\n"  +  String(co2_ppm) + "\n" + String(light) +"\n" + pir_event +"\n" +motion_event +"\n");  
+    http_put_data = String(String(temperature) + "\n" + String(humidity) + "\n"  +  String(co2_ppm) + "\n" + String(light) +"\n" + pir_event +"\n" +motion_event +"\n" + String(bat_volt) +"\n");  
   }
   if( wifi.connect(serverAddress,port)){
     if(wifi.connected()){
@@ -176,7 +175,7 @@ void print_response(void){
   Serial.println(String(http_response + "\n"));
 
   Serial.println("Measured Data: ");
-  Serial.println(String("Temperature (Celsius): " + String(temperature) + "\n" + "Humidtiy:" + String(humidity) + "\n"  + "co2 (ppm)" + co2_ppm + "\n" + "Light:" + light + "\n" + "PIR Event" + pir_event + "\n" + "Motion Event" + motion_event + "\n"));
+  Serial.println(String("Temperature (Celsius): " + String(temperature) + "\n" + "Humidtiy:" + String(humidity) + "\n"  + "co2 (ppm)" + co2_ppm + "\n" + "Light:" + light + "\n" + "PIR Event" + pir_event + "\n" + "Motion Event" + motion_event + "\n" + "Battery Voltage: " + bat_volt));
 
   Serial.println("Wait five seconds");
   Serial.println("/////////////////////");

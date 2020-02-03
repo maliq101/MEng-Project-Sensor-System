@@ -5,6 +5,7 @@
         "arduino_secrets.h": "c",
         "wifiudp.h": "c",
         "wifinina.h": "c",
-        "arduinohttpclient.h": "c"
+        "arduinohttpclient.h": "c",
+        "arduinolowpower.h": "c"
     }
 }

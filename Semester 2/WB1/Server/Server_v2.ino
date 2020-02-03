@@ -1,3 +1,5 @@
+#include <ArduinoLowPower.h>
+
 /*
 Sensor sends data using PUT HTTP Reuest over Wifi.
 Data briefly stored in struct 
@@ -25,6 +27,7 @@ struct
   String body_string;
   float temperature;
   float humidity;
+  float bat_volt;
   unsigned int light;
   unsigned int co2;
   unsigned int voc;
@@ -43,7 +46,8 @@ struct sensor_information // struct used for stroing all information releveant f
   byte month = 12;
   byte year = 19;
   String contact_time ="";
-  String Location;
+  String status;
+  String location;
   String temperature;
   String humidity;
   String light;
@@ -51,6 +55,7 @@ struct sensor_information // struct used for stroing all information releveant f
   String voc;
   String pir_event;
   String motion_event;   
+  String bat_volt;
 }sensor1,sensor2;
 
 
@@ -191,8 +196,8 @@ String get_response(String url_1){//function selects correct response body, depe
   if(url_1=="sensor1"){
     http_content_type="text/html";
     body ="<p>Latest measurement from Sensor 1</p>";
-    body+="<table> <tr> <th> Date and Time </th> <th> Temperature (C)</th> <th> Humiditiy (Percent) </th> <th> Light (Lux) </th> <th> CO2 (ppm) </th> <th> PIR Event </th> <th> Motion Event </th> </tr>";
-    body+="<td>" + sensor1.contact_time + "</td> <td>" + sensor1.temperature + "</td> <td>"+ sensor1.humidity + "</td> <td>"+ sensor1.light + "</td> <td>"+ sensor1.co2 + "</td> <td>"+ sensor1.pir_event + "</td> <td>"+ sensor1.motion_event + "</td> <td> </table>";
+    body+="<table> <tr> <th> Date and Time </th> <th> Temperature (C)</th> <th> Humiditiy (Percent) </th> <th> Light (Lux) </th> <th> CO2 (ppm) </th> <th> PIR Event </th> <th> Motion Event </th> <th> Battery Voltage (V) </th></tr>";
+    body+="<tr> <td>" + sensor1.contact_time + "</td> <td>" + sensor1.temperature + "</td> <td>"+ sensor1.humidity + "</td> <td>"+ sensor1.light + "</td> <td>"+ sensor1.co2 + "</td> <td>"+ sensor1.pir_event + "</td> <td>"+ sensor1.motion_event + "</td> <td>" + sensor1.bat_volt + "</td> </tr> </table>";
     body+="<p><a href = \'/sensor1.csv\' target= '_blank'> Click here to  full .csv file </a></p>";
     body+="<p><a href = \'homepage\'> Click here to go back to homepage</a></p>";
     return body;
@@ -200,8 +205,8 @@ String get_response(String url_1){//function selects correct response body, depe
   if(url_1=="sensor2"){
     http_content_type="text/html";
     body ="<p>Latest measurement from Sensor 2</p>";
-    body+="<table> <tr> <th> Date and Time </th> <th> Temperature (C)</th> <th> Humiditiy (Percent) </th> <th> Light (Lux) </th> <th> CO2 (ppm) </th> <th> PIR Event </th> <th> Motion Event </th> </tr>";
-    body+="<td>" + sensor2.contact_time + "</td> <td>" + sensor2.temperature + "</td> <td>"+ sensor2.humidity + "</td> <td>"+ sensor2.light + "</td> <td>"+ sensor2.co2 + "</td> <td>"+ sensor2.pir_event + "</td> <td>"+ sensor2.motion_event + "</td> <td> </table>";
+    body+="<table> <tr> <th> Date and Time </th> <th> Temperature (C)</th> <th> Humiditiy (Percent) </th> <th> Light (Lux) </th> <th> CO2 (ppm) </th> <th> PIR Event </th> <th> Motion Event </th> <th> Battery Voltage (V) </th> </tr>";
+    body+="<td>" + sensor2.contact_time + "</td> <td>" + sensor2.temperature + "</td> <td>"+ sensor2.humidity + "</td> <td>"+ sensor2.light + "</td> <td>"+ sensor2.co2 + "</td> <td>"+ sensor2.pir_event + "</td> <td>"+ sensor2.motion_event + "</td> <td>" + sensor2.bat_volt + "</td> </tr> </table>";
     body+="<p><a href = \'/sensor2.csv\' target= '_blank'> Click here to  full .csv file </a></p>";
     body+="<p><a href = \'homepage\'> Click here to go back to homepage</a></p>";
     return body;
@@ -228,19 +233,15 @@ String get_response(String url_1){//function selects correct response body, depe
     }
     return download_file;
   }
-  else if (url_1=="status"){
-    http_content_type="text/html";
-    body="<table> <tr> <th> Sensor Number </th> <th> Location </th> <th> Status </th> <th> Time of Last Communication </th> </tr>";
-    body+="<tr> <td> 1 </td> <td> Room 1 </td> <td> Ok </td> <td>" + sensor1.contact_time + "</td> </tr>";
-    body+="<tr> <td> 2 </td> <td> Room 2 </td> <td> Ok </td> <td>" + sensor2.contact_time + "</td> </tr> </table>";
-    return body;
-  }
   else if (url_1==""){
     http_content_type="text/html";
     body="<p>Hompage with links to each sensor in html. will also show latest measurements for each sensor</p>" ;
     body+="<p><a href = \'/sensor1\'> Click here for sensor 1 information</a></p>";
     body+="<p><a href = \'/sensor2\'> Click here for sensor 2 information</a></p>";
-    body+="<p><a href = \'/status\'> Click here for Status on all sensors </a></p>";
+    body+="<table> <tr> <th> Sensor Number </th> <th> Location </th> <th> Status </th> <th> Time of Last Communication </th> <th> Battery Voltage (V) </th> </tr>";
+    body+="<tr> <td> 1 </td> <td> Room 1 </td> <td>" + sensor1.status + "</td> <td>" + sensor1.contact_time + "</td> <td>" + sensor1.bat_volt +"</td> </tr>";
+    body+="<tr> <td> 2 </td> <td> Room 2 </td> <td>" + sensor2.status + "</td> <td>" + sensor2.contact_time + "</td> <td>" + sensor2.bat_volt +"</td> </tr> </table>";
+
     return body;
     } 
   else if (url_1=="homepage"){
@@ -248,7 +249,9 @@ String get_response(String url_1){//function selects correct response body, depe
     body="<p>Hompage with links to each sensor in html. will also show latest measurements for each sensor</p>" ;
     body+="<p><a href = \'/sensor1\'> Click here for sensor 1 information</a></p>";
     body+="<p><a href = \'/sensor2\'> Click here for sensor 2 information</a></p>";
-    body+="<p><a href = \'/status\'> Click here for Status on all sensors </a></p>" ;
+    body+="<table> <tr> <th> Sensor Number </th> <th> Location </th> <th> Status </th> <th> Time of Last Communication </th> </tr>";
+    body+="<tr> <td> 1 </td> <td> Room 1 </td> <td> Ok </td> <td>" + sensor1.contact_time + "</td> </tr>";
+    body+="<tr> <td> 2 </td> <td> Room 2 </td> <td> Ok </td> <td>" + sensor2.contact_time + "</td> </tr> </table>";
     return body;
     } 
   else{
@@ -294,6 +297,11 @@ void buffer_data(void){//retrieve data sent by sensor and store it in buffer str
   current_sensor.motion_event = temp;
   length += temp.length();
   length++;
+
+  temp = data1.substring(length,data2.indexOf("\n",length));
+  current_sensor.bat_volt = temp.toFloat();
+  length += temp.length();
+  length++;
   
 }
 void store_data(void){
@@ -310,6 +318,7 @@ void store_data(void){
     sensor1.co2 = String(current_sensor.co2);
     sensor1.pir_event= current_sensor.pir_event;
     sensor1.motion_event= current_sensor.motion_event;
+    sensor1.bat_volt=String(current_sensor.bat_volt);
     break;
   case 2://data recieved from sensor 2
     filename="sensor2.csv"; 
@@ -319,6 +328,7 @@ void store_data(void){
     sensor2.co2 = String(current_sensor.co2);
     sensor2.pir_event= current_sensor.pir_event;
     sensor2.motion_event= current_sensor.motion_event;
+    sensor2.bat_volt=String(current_sensor.bat_volt);
     break;
   default:
     filename= "no file selected";
@@ -326,7 +336,7 @@ void store_data(void){
   }
   Serial.print("File Selected: ");
   Serial.println(filename);
-  data = String(rtc.getDay()) + "/" + String(rtc.getMonth()) + "/" + String(rtc.getYear()) + ","+ String(rtc.getHours()) + ":" + String(rtc.getMinutes()) + ":" + String(rtc.getSeconds()) + "," + String(current_sensor.temperature) + "," + String(current_sensor.humidity) + "," + String(current_sensor.co2) + "," + String(current_sensor.light) + "," + current_sensor.pir_event + "," + current_sensor.motion_event;
+  data = String(rtc.getDay()) + "/" + String(rtc.getMonth()) + "/" + String(rtc.getYear()) + ","+ String(rtc.getHours()) + ":" + String(rtc.getMinutes()) + ":" + String(rtc.getSeconds()) + "," + String(current_sensor.temperature) + "," + String(current_sensor.humidity) + "," + String(current_sensor.co2) + "," + String(current_sensor.light) + "," + current_sensor.pir_event + "," + current_sensor.motion_event + "," + current_sensor.bat_volt;
   Serial.print("Date to be written to SD: " );
   Serial.println(data);
   file=SD.open(filename,FILE_WRITE);
@@ -353,7 +363,7 @@ void create_file(String filename){//function creates a file and adds the table h
         Serial.println("Headers exist. ");
       }
       else{//no header
-        file.println("Date,Time,Temperature (Celcius),Humiditiy (percent),CO2 (ppm),Light (Lux) ,PIR Event,Motion Event");
+        file.println("Date,Time,Temperature (Celcius),Humiditiy (percent),CO2 (ppm),Light (Lux) ,PIR Event,Motion Event,Battery Voltage (V)");
         Serial.println("Headers did not existed. Added Headers");
       }
       file.close();
@@ -366,7 +376,7 @@ void create_file(String filename){//function creates a file and adds the table h
     file=SD.open(filename,FILE_WRITE);
       if(file){//file opened Successful
         Serial.println("File did not exist, File Created");
-        file.println("Date,Time,Temperature (Celcius),Humiditiy (percent),CO2 (ppm),Light (ppm),PIR Event,Motion Event");
+        file.println("Date,Time,Temperature (Celcius),Humiditiy (percent),CO2 (ppm),Light (ppm),PIR Event,Motion Event,Battery Voltage (V)");
         file.close();
       }
       else{
@@ -404,6 +414,7 @@ void check_sensor_last_contact_time(int sensor_number){
   signed int last_minute;//last Successful Communication minute
   signed int current_minute=rtc.getMinutes();
   signed int temp;
+  String status="";
   switch (sensor_number)
   {
   case 1:
@@ -424,11 +435,13 @@ void check_sensor_last_contact_time(int sensor_number){
     temp=current_minute;
   }
   if(((temp-last_minute)<=2)&&((temp-last_minute)>=0)){
-    Serial.println(": OK");   
+    Serial.println(": OK");
+    status="OK";
   }
   else{
     //lost contact with sensor
     Serial.println(": Lost contact");
+    status="Error";
     switch (sensor_number)
     {
       case 1:
@@ -440,6 +453,17 @@ void check_sensor_last_contact_time(int sensor_number){
       default:
         break;
     }
+  }
+  switch (sensor_number)
+  {
+  case 1:
+    sensor1.status=status;
+    break;
+  case 2:
+    sensor2.status=status;
+    break;
+  default:
+    break;
   }
 }
 void printWiFiStatus() {
