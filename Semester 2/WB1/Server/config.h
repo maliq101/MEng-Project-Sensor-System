@@ -1,0 +1,9 @@
+#define SECRET_SSID "ESP_3422B9"
+#define SECRET_PASS ""
+
+#define LOCATION_1 "ROOM1"
+#define LOCATION_2 "ROOM2"
+#define LOCATION_3 "ROOM3"
+#define LOCATION_4 "ROOM4"
+#define LOCATION_5 "ROOM5"
+#define LOCATION_6 "ROOM6"
