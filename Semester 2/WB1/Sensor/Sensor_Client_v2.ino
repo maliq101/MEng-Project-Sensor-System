@@ -53,7 +53,7 @@ void setup() {
   pinMode(3,OUTPUT);//Green commincation with sensor IC
   pinMode(2,OUTPUT);//Green commincation with Server
   Wire.begin();//begin i2c commincation for sensor
- // connect_to_wifi();
+  connect_to_wifi();
 }
 
 void loop() {
