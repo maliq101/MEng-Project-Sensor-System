@@ -15,16 +15,17 @@ BLUE=SDA
 #include <ArduinoLowPower.h>
 #include <ArduinoHttpClient.h>
 #include <WiFiNINA.h>
-#include "arduino_secrets.h"
+#include "Sensor_Config.h"
+
 #include <Wire.h>
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 /////// Wifi Settings ///////
-char ssid[] = SECRET_SSID;
+char ssid[] = SERVER_SSID;
 char pass[] = SECRET_PASS;
 
 ///Create wificlient object, HTTP client object and relevant variables
-char serverAddress[] = "192.168.4.1";  // server address
+char serverAddress[] = SERVER_IP;  // server address
 int port = 80;//port number for HTTP
 WiFiClient wifi;//Create a wifi Client object called wifi.
 HttpClient client = HttpClient(wifi, serverAddress, port);//create http client object  using the wifi client object
@@ -33,7 +34,7 @@ int http_status_code = client.responseStatusCode();
 String http_response = client.responseBody();
 String http_content_type;
 String http_put_data;
-String sensor_number = "/1";//sensor number sent as http url
+String sensor_number = SENSOR_2;//sensor number sent as http url
 
 
 //variables for sensor 
@@ -47,14 +48,12 @@ int sample_time=15000;//15 seconds
 
 void setup() {
   Serial.begin(9600);
-  pinMode(0,OUTPUT);//commuication with server
-  pinMode(2,OUTPUT);//RED
-  pinMode(3,OUTPUT);//commicating with sensor
-  pinMode(5,OUTPUT);//RED
+  pinMode(0,OUTPUT);//RED no commincation with server
+  pinMode(1,OUTPUT);//RED Low Battery
+  pinMode(3,OUTPUT);//Green commincation with sensor IC
+  pinMode(5,OUTPUT);//Green commincation with Server
   Wire.begin();//begin i2c commincation for sensor
   connect_to_wifi();
-
-
 }
 
 void loop() {
@@ -62,11 +61,19 @@ void loop() {
   digitalWrite(3,HIGH);
   read_sensor();
   digitalWrite(3,LOW);
-  digitalWrite(0,HIGH);
+  if(bat_volt<=2){
+    digitalWrite(1,HIGH);
+  }
+  else{
+    digitalWrite(1,LOW);
+  }
+  digitalWrite(5,HIGH);
   put_request("data");
-  digitalWrite(0,LOW);
+  digitalWrite(5,LOW);
   print_response();
+  WiFi.lowPowerMode();
   delay(sample_time);
+  WiFi.noLowPowerMode();
 }
 
 void connect_to_wifi(void){
@@ -91,10 +98,10 @@ void connect_to_wifi(void){
 }
 void reconnect_to_wifi(void){
   while ( wifi_status != WL_CONNECTED) {
-    digitalWrite(5,HIGH);
+    digitalWrite(0,HIGH);
     wifi_status = WiFi.begin(ssid, pass);// Connect to WPA/WPA2 network:
   }
-  digitalWrite(5,LOW);
+  digitalWrite(0,LOW);
 }
 void read_sensor(void){
 // All sensors except the CO2 sensor are scanned in response to this command
@@ -177,7 +184,7 @@ void print_response(void){
   Serial.println("Measured Data: ");
   Serial.println(String("Temperature (Celsius): " + String(temperature) + "\n" + "Humidtiy:" + String(humidity) + "\n"  + "co2 (ppm)" + co2_ppm + "\n" + "Light:" + light + "\n" + "PIR Event" + pir_event + "\n" + "Motion Event" + motion_event + "\n" + "Battery Voltage: " + bat_volt));
 
-  Serial.println("Wait five seconds");
+  Serial.println("Wait 15 second");
   Serial.println("/////////////////////");
 }
 void wifi_error(void){
