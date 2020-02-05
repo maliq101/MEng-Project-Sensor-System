@@ -51,7 +51,7 @@ void setup() {
   pinMode(0,OUTPUT);//RED no commincation with server
   pinMode(1,OUTPUT);//RED Low Battery
   pinMode(3,OUTPUT);//Green commincation with sensor IC
-  pinMode(5,OUTPUT);//Green commincation with Server
+  pinMode(2,OUTPUT);//Green commincation with Server
   Wire.begin();//begin i2c commincation for sensor
   connect_to_wifi();
 }
@@ -67,9 +67,9 @@ void loop() {
   else{
     digitalWrite(1,LOW);
   }
-  digitalWrite(5,HIGH);
+  digitalWrite(2,HIGH);
   put_request("data");
-  digitalWrite(5,LOW);
+  digitalWrite(2,LOW);
   print_response();
   WiFi.lowPowerMode();
   delay(sample_time);
