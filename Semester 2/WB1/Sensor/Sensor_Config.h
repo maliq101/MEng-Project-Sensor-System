@@ -2,6 +2,8 @@
 //server 1
 #define SERVER_SSID "ESP_3422B9"
 #define SERVER_IP "192.168.4.1"
+//#define SERVER_SSID ""
+//#define SERVER_IP ""
 #define SECRET_PASS ""
 
 #define SENSOR_1 "/1"
