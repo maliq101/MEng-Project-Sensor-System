@@ -18,7 +18,6 @@ RTC functionallity added
 char ssid[] = "";        // your network SSID (name)
 char pass[] = "";    // your network password (use for WPA, or use as key for WEP)
 WiFiServer server(80);//port for HTTP
-char clientAddress[] = "192.168.4.2";  // connected client address
 int port = 80;//port number for HTTP
 int wifi_status = WL_IDLE_STATUS;
 
@@ -40,12 +39,12 @@ String http_content_type;//used to determine http reply content type. csv for fi
 
 struct sensor_information // struct used for stroing all information releveant for each sensor unit
 {
-  byte seconds = 20;
-  byte minutes = 59;
-  byte hours = 23;
-  byte day = 19;
-  byte month = 12;
-  byte year = 19;
+  byte seconds = 00;
+  byte minutes = 17;
+  byte hours = 13;
+  byte day = 07;
+  byte month = 02;
+  byte year = 20;
   String contact_time ="";
   String status;
   String location;
@@ -61,25 +60,22 @@ struct sensor_information // struct used for stroing all information releveant f
 }sensor1,sensor2,sensor3;
 
 RTCZero rtc;//create an rtc object
-const byte seconds = 20;
-const byte minutes = 59;
-const byte hours = 23;
-const byte day = 19;
-const byte month = 12;
-const byte year = 19;
+const byte seconds = 00;
+const byte minutes = 36;
+const byte hours = 13;
+const byte day = 07;
+const byte month = 02;
+const byte year = 20;
 
 const int chipSelect = 4;
 File file;
 void setup() {
-  //Serial
-  Serial.begin(9600);  //Initialize serial and wait for port to open:
   //RTC
   rtc.begin();//initialize RTC
   rtc.setTime(hours,minutes,seconds);
   rtc.setDate(day,month,year);
   //SD
   if (!SD.begin(4)) {
-    Serial.println("SD initialization failed!");
     while (1);
   }
     //GPIO
@@ -89,43 +85,18 @@ void setup() {
  // pinMode(5,OUTPUT);//RED
 
   //Wifi
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
-
-  Serial.println("Access Point Web Server");
-  // check for the WiFi module:
-  if (WiFi.status() == WL_NO_MODULE) {
-    Serial.println("Communication with WiFi module failed!");
-    // don't continue
-    while (true);
-  }
-
-  String fv = WiFi.firmwareVersion();
-  if (fv < "1.0.0") {
-    Serial.println("Please upgrade the firmware");
-  }
-
-  // by default the local IP address of will be 192.168.4.1
-  // you can override it with the following:
-  // WiFi.config(IPAddress(10, 0, 0, 1));
-
-  // print the network name (SSID);
-  Serial.print("Creating access point named: ");
-  Serial.println(ssid);
-
+  //while (!Serial) {
+  //  ; // wait for serial port to connect. Needed for native USB port only
+  //}
   // Create open network. Change this line if you want to create an WEP network:
   wifi_status = WiFi.beginAP(ssid);
   if (wifi_status != WL_AP_LISTENING) {
-    Serial.println("Creating access point failed");
     // don't continue
     while (true);
   }
 
   delay(10000);// wait 10 seconds for connection:
   server.begin();// start the web server on port 80
-  printWiFiStatus();// you're connected now, so print out the status  
-  Serial.println("Creating csv files for sensors");
   create_file("sensor1.csv");
   create_file("sensor1F.csv");
   create_file("sensor2.csv");
@@ -150,11 +121,6 @@ void loop()
         if( method == ArduinoHttpServer::MethodGet )//GET request from web client
         {   
             digitalWrite(2,HIGH);
-            //Print URL request from client
-            Serial.println("GET Request Received from Web browser");
-            Serial.print("data varable selected: ");
-            Serial.println( httpRequest.getResource()[0] );
-
             //send requested data
             response_body= get_response(httpRequest.getResource()[0]);//response body chosen by URL sent using response_bodyt function
             ArduinoHttpServer::StreamHttpReply httpReply(client,http_content_type);//create http reply object
@@ -165,14 +131,12 @@ void loop()
          {
            ArduinoHttpServer::StreamHttpReply httpReply(client,"text/plain");//create http reply object
            digitalWrite(0,HIGH);
-           Serial.println("PUT Request Received");
+
            current_sensor.number = httpRequest.getResource()[0];//sensor number used for determing what file to store data in
            current_sensor.body_string = httpRequest.getBody();//retreive the end of url determining data sent by sensor
            buffer_data();//retreive measured data from body string and store it in buffer struct
            response_body="Data Received by Server";//
            httpReply.send(response_body); //send ok status
-           Serial.println("Recieved PUT String Body: ");
-           Serial.println(current_sensor.body_string);
            store_data();//function stores temporary data stored in sturct to permenant file in SD card
            update_sensor_last_contact_time();//update the last confirmed Communication time for the current_sensor
           //print recieved data and send ok http repsonse to client
@@ -190,9 +154,6 @@ void loop()
            digitalWrite(1,LOW);
          }
         }
-         else{
-           Serial.println("Neither GET or PUT");
-         }
       }
       else{//Error
          // HTTP parsing failed. Client did not provide correct HTTP data or
@@ -279,7 +240,7 @@ String get_response(String url_1){//function selects correct response body, depe
     body+="<p><a href = \'/sensor1\'> Click here for sensor 1 information</a></p>";
     body+="<p><a href = \'/sensor2\'> Click here for sensor 2 information</a></p>";
     body+="<p><a href = \'/sensor3\'> Click here for sensor 3 information</a></p>";
-    body+="<table> <tr> <th> Sensor Number </th> <th> Location </th> <th> Status </th> <th> Time of Last Communication </th> <th> Battery Voltage (V) </th> <th> File Size (B) </td> </tr>";
+    body+="<table> <tr> <th> Sensor Number </th> <th> Location </th> <th> Status </th> <th> Time of Last Communication </th> <th> Battery Voltage (V) </th> <th> File Size (B) </th> </tr>";
     body+="<tr> <td> 1 </td> <td>" + sensor1.location + "</td> <td>" + sensor1.status + "</td> <td>" + sensor1.contact_time + "</td> <td>" + sensor1.bat_volt +"</td> <td>" + sensor1.file_size + "</td> </tr>";
     body+="<tr> <td> 2 </td> <td>" + sensor2.location + "</td> <td>" + sensor2.status + "</td> <td>" + sensor2.contact_time + "</td> <td>" + sensor2.bat_volt +"</td> <td>" + sensor2.file_size + "</td> </tr>";
     body+="<tr> <td> 3 </td> <td>" + sensor3.location + "</td> <td>" + sensor3.status + "</td> <td>" + sensor3.contact_time + "</td> <td>" + sensor3.bat_volt +"</td> <td>" + sensor3.file_size + "</td> </tr> </table>";
@@ -291,6 +252,8 @@ String get_response(String url_1){//function selects correct response body, depe
     body="<p>Summary of all Sensors</p>" ;
     body+="<p><a href = \'/sensor1\'> Click here for sensor 1 information</a></p>";
     body+="<p><a href = \'/sensor2\'> Click here for sensor 2 information</a></p>";
+    body+="<p><a href = \'/sensor3\'> Click here for sensor 3 information</a></p>";
+    body+="<table> <tr> <th> Sensor Number </th> <th> Location </th> <th> Status </th> <th> Time of Last Communication </th> <th> Battery Voltage (V) </th> <th> File Size (B) </th> </tr>";
     body+="<tr> <td> 1 </td> <td>" + sensor1.location + "</td> <td>" + sensor1.status + "</td> <td>" + sensor1.contact_time + "</td> <td>" + sensor1.bat_volt +"</td> <td>" + sensor1.file_size + "</td> </tr>";
     body+="<tr> <td> 2 </td> <td>" + sensor2.location + "</td> <td>" + sensor2.status + "</td> <td>" + sensor2.contact_time + "</td> <td>" + sensor2.bat_volt +"</td> <td>" + sensor2.file_size + "</td> </tr>";
     body+="<tr> <td> 3 </td> <td>" + sensor3.location + "</td> <td>" + sensor3.status + "</td> <td>" + sensor3.contact_time + "</td> <td>" + sensor3.bat_volt +"</td> <td>" + sensor3.file_size + "</td> </tr> </table>";
@@ -304,7 +267,6 @@ String get_response(String url_1){//function selects correct response body, depe
   }
 }
 void buffer_data(void){//retrieve data sent by sensor and store it in buffer struct
-
   //retreive each measurement from body string
   //temperature + \n + humidity + \n + \n + co2 + \n + light
   String data1=current_sensor.body_string;
@@ -394,10 +356,10 @@ void store_data(void){
     previous_day=sensor2.day;
     
     file=SD.open(filename,FILE_READ);
-    sensor1.file_size=file.size();
+    sensor2.file_size=file.size();
     file.close();
     break;
-  case 3://data recieved from sensor 1
+  case 3://data recieved from sensor 3
     filename="sensor3.csv";
     filenameF="sensor3F.csv";
     sensor3.temperature= String(current_sensor.temperature);
@@ -414,14 +376,8 @@ void store_data(void){
     file.close();
     break;
   default:
-    filename= "no file selected";
-    filenameF= "no file selected";
     break;
   }
-  Serial.print("File Selected: ");
-  Serial.print(filename);
-  Serial.print(", ");
-  Serial.println(filenameF);
   if(day!=previous_day){
     data= String(rtc.getDay()) + "/" + String(rtc.getMonth()) + "/" + String(rtc.getYear()) + ","; 
   }
@@ -429,63 +385,39 @@ void store_data(void){
     data=",";
   }
   data += String(rtc.getHours()) + ":" + String(rtc.getMinutes()) + ":" + String(rtc.getSeconds()) + "," + String(current_sensor.temperature) + "," + String(current_sensor.humidity) + "," + String(current_sensor.co2) + "," + String(current_sensor.light) + "," + current_sensor.pir_event + "," + current_sensor.motion_event + "," + current_sensor.bat_volt;
-  Serial.print("Date to be written to SD: " );
-  Serial.println(data);
   //store in short file
   file=SD.open(filename,FILE_WRITE);
-  if(file){//if file opened Successful
+
     file.println(data);
     file.close();
-    Serial.println("success");
-  }
-  else{//Error
-    Serial.println("Error writing data to file");
-  }
+
   //store in full file
   file=SD.open(filenameF,FILE_WRITE);
-  if(file){//if file opened Successful
+
     file.println(data);
     file.close();
-    Serial.println("success");
-  }
-  else{//Error
-    Serial.println("Error writing data to file");
-  }
+  
 }
 void create_file(String filename){//function creates a file and adds the table header if required
   char data_on_file;//used to test first char in file
-  Serial.print("Creating File: ");
-  Serial.println(filename);
-  //check to see if file exists
+    //check to see if file exists
   if(SD.exists(filename)){
     file=SD.open(filename);
     //file exists
     if(file){//if opened Successful
-      Serial.print("File Exists. ");
       data_on_file=file.read();//read first char 
-      if(data_on_file=='D'){  //header Exists
-        Serial.println("Headers exist. ");
-      }
-      else{//no header
+      if(data_on_file!='D'){//no header Exists
         file.println("Date,Time,Temperature (Celcius),Humiditiy (percent),CO2 (ppm),Light (Lux) ,PIR Event,Motion Event,Battery Voltage (V)");
-        Serial.println("Headers did not existed. Added Headers");
       }
-      file.close();
     }
-    else{//Error
-      Serial.println("Error Opening file. File has been created");
-    }
+    file.close();
   }
   else{ //no File exists
     file=SD.open(filename,FILE_WRITE);
       if(file){//file opened Successful
-        Serial.println("File did not exist, File Created");
-        file.println("Date,Time,Temperature (Celcius),Humiditiy (percent),CO2 (ppm),Light (ppm),PIR Event,Motion Event,Battery Voltage (V)");
-        file.close();
+        file.println("Date,Time,Temperature (Celcius),Humiditiy (percent),CO2 (ppm),Light (Lux),PIR Event,Motion Event,Battery Voltage (V)");
       }
-      else{
-        Serial.println("Error Opening file. File not created");
-      }
+  file.close();
   }
 }
 void update_sensor_last_contact_time(void){
@@ -520,7 +452,6 @@ void update_sensor_last_contact_time(void){
     default:
       break;
     }
-  Serial.println("Last contact time of Sensor" + String(sensor_number) + " has been updated");
 }
 void check_sensor_last_contact_time(int sensor_number){
   signed int last_minute;//last Successful Communication minute
@@ -549,7 +480,6 @@ void check_sensor_last_contact_time(int sensor_number){
   default:
     break;
   }
-  Serial.print("Contact status of Sensor " + String(sensor_number));
   if((current_minute<1)&&(last_minute>1)){
     //acounting for minute overflow
     temp=current_minute+60;
@@ -558,31 +488,13 @@ void check_sensor_last_contact_time(int sensor_number){
     temp=current_minute;
   }
   if((((temp-last_minute)<=2)&&((temp-last_minute)>=0))&&(volt>=2)&&(file_size<=6000)){
-    Serial.println(": OK");
     status="OK";
   }
   else{
     //lost contact with sensor
-    Serial.println(": Lost contact");
     status="Error";
-    switch (sensor_number)
-    {
-      case 1:
-        Serial.println("Last Successful contact at: " + String(sensor1.day) + "/" + String(sensor1.month) + "/" + String(sensor1.year) + "   "+ String(sensor1.hours) + ":" + String(sensor1.minutes) + ":" + String(sensor1.seconds));
-        break;
-      case 2:
-        Serial.println("Last Successful contact at: " + String(sensor2.day) + "/" + String(sensor2.month) + "/" + String(sensor2.year) + "   "+ String(sensor2.hours) + ":" + String(sensor2.minutes) + ":" + String(sensor2.seconds));
-        break;
-      case 3:
-        Serial.println("Last Successful contact at: " + String(sensor3.day) + "/" + String(sensor3.month) + "/" + String(sensor3.year) + "   "+ String(sensor3.hours) + ":" + String(sensor3.minutes) + ":" + String(sensor3.seconds));
-        break;
-      default:
-        break;
-    }
-  Serial.println("/////////");
-  Serial.println();
   }
-  switch (sensor_number)
+ switch (sensor_number)
   {
   case 1:
     sensor1.status=status;
@@ -590,56 +502,13 @@ void check_sensor_last_contact_time(int sensor_number){
   case 2:
     sensor2.status=status;
     break;
+  case 3:
+    sensor3.status=status;
+    break;
   default:
     break;
   }
 }
-void printWiFiStatus() {
-  // print the SSID of the network you're attached to:
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-
-  // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-
-  // print where to go in a browser:
-  Serial.print("To see this page in action, open a browser to http://");
-  Serial.println(ip);
-
-  Serial.print("MAC Address:" );
-  byte mac[6];
-  WiFi.macAddress(mac);
-  for (int i = 5; i >= 0; i--) {
-    if (mac[i] < 16) {
-      Serial.print("0");
-    }
-  Serial.print(mac[i], HEX);
-    if (i > 0) {
-      Serial.print(":");
-    }
-  }
-  Serial.println();
-
-}
-void print_date(void){
-  print2digits(rtc.getDay());
-  Serial.print("/");
-  print2digits(rtc.getMonth());
-  Serial.print("/");
-  print2digits(rtc.getYear());
-}
-void print_time(void){
-  print2digits(rtc.getHours());
-  Serial.print(":");
-  print2digits(rtc.getMinutes());
-  Serial.print(":");
-  print2digits(rtc.getSeconds());
-}
-void print2digits(int number) {
-  if (number < 10) {
-    Serial.print("0"); // print a 0 before if the number is < than 10
-  }
-  Serial.print(number);
+void SD_to_Flash(String filename){
+  //function copies the selected file from SD card to flash memory for transmission
 }
