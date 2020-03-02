@@ -34,7 +34,7 @@ int http_status_code = client.responseStatusCode();
 String http_response = client.responseBody();
 String http_content_type;
 String http_put_data;
-String sensor_number = SENSOR_2;//sensor number sent as http url
+String sensor_number = SENSOR_1;//sensor number sent as http url
 
 
 //variables for sensor 
@@ -44,22 +44,28 @@ unsigned int sensor_status,light,co2_ppm,voc_ppm;
 String pir_event="";
 String motion_event="";
 
-int sample_time=60000;//15 seconds
+int sample_time=120000;//15 seconds
 
 void setup() {
   pinMode(0,OUTPUT);//RED no commincation with server
   pinMode(1,OUTPUT);//RED Low Battery
   pinMode(3,OUTPUT);//Green commincation with sensor IC
   pinMode(2,OUTPUT);//Green commincation with Server
+  pinMode(7,OUTPUT);//Power for AmbiMate sensor
+  digitalWrite(7,HIGH);
+  delay(3000);
   Wire.begin();//begin i2c commincation for sensor
   connect_to_wifi();
 }
 
 void loop() {
-
+  digitalWrite(7,HIGH);
   digitalWrite(3,HIGH);
+  delay(5000);
+  Wire.begin();//begin i2c commincation for sensor
   read_sensor();
   digitalWrite(3,LOW);
+  digitalWrite(7,LOW);
   if(bat_volt<=2){
     digitalWrite(1,HIGH);
   }
@@ -69,18 +75,15 @@ void loop() {
   digitalWrite(2,HIGH);
   put_request("data");
   digitalWrite(2,LOW);
-  WiFi.lowPowerMode();
-  delay(sample_time);
-  WiFi.noLowPowerMode();
+  LowPower.sleep(sample_time);
 }
-
 void connect_to_wifi(void){
   while ( wifi_status != WL_CONNECTED) {
-    digitalWrite(5,HIGH);
+    digitalWrite(0,HIGH);
     // Connect to WPA/WPA2 network:
     wifi_status = WiFi.begin(ssid, pass);
   }
-  digitalWrite(5,LOW);
+  digitalWrite(0,LOW);
 
 
   // print your WiFi shield's IP address:
@@ -189,4 +192,8 @@ void wifi_error(void){
     break;
   }
 
+}
+void dummy(){
+  reconnect_to_wifi();
+  //called on wakeup cause by Internal RTC interrupt
 }

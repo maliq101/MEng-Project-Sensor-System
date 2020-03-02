@@ -1,6 +1,6 @@
 {
     "programmer": "AVR ISP",
     "board": "arduino:samd:mkrwifi1010",
-    "port": "COM8",
-    "sketch": "Semester 2\\WB1\\Final\\Server\\Server_v3.ino"
+    "port": "COM14",
+    "sketch": "E:\\Uni\\Arduino\\generated_examples\\CopyFromSD\\CopyFromSD.ino"
 }

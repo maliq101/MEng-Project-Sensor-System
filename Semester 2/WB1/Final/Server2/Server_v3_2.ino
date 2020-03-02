@@ -39,12 +39,12 @@ String http_content_type;//used to determine http reply content type. csv for fi
 
 struct sensor_information // struct used for stroing all information releveant for each sensor unit
 {
-  byte seconds = 00;
-  byte minutes = 17;
-  byte hours = 13;
-  byte day = 07;
-  byte month = 02;
-  byte year = 20;
+  byte seconds;
+  byte minutes;
+  byte hours;
+  byte day;
+  byte month;
+  byte year;
   String contact_time ="";
   String status;
   String location;
@@ -57,12 +57,12 @@ struct sensor_information // struct used for stroing all information releveant f
   String motion_event;   
   String bat_volt;
   unsigned long file_size;
-}sensor1,sensor2,sensor3;
+}sensor4,sensor5,sensor6;
 
 RTCZero rtc;//create an rtc object
 const byte seconds = 00;
-const byte minutes = 36;
-const byte hours = 13;
+const byte minutes = 55;
+const byte hours = 23;
 const byte day = 07;
 const byte month = 02;
 const byte year = 20;
@@ -89,7 +89,7 @@ void setup() {
   //  ; // wait for serial port to connect. Needed for native USB port only
   //}
   // Create open network. Change this line if you want to create an WEP network:
-  wifi_status = WiFi.beginAP(ssid, pass);
+  wifi_status = WiFi.beginAP(ssid);
   if (wifi_status != WL_AP_LISTENING) {
     // don't continue
     while (true);
@@ -97,15 +97,15 @@ void setup() {
 
   delay(10000);// wait 10 seconds for connection:
   server.begin();// start the web server on port 80
-  create_file("sensor1.csv");
-  create_file("sensor1F.csv");
-  create_file("sensor2.csv");
-  create_file("sensor2F.csv");
-  create_file("sensor3.csv");
-  create_file("sensor3F.csv");
-  sensor1.location=LOCATION_1;
-  sensor2.location=LOCATION_2;
-  sensor3.location=LOCATION_3;
+  create_file("sensor4.csv");
+  create_file("sensor4F.csv");
+  create_file("sensor5.csv");
+  create_file("sensor5F.csv");
+  create_file("sensor6.csv");
+  create_file("sensor6F.csv");
+  sensor4.location=LOCATION_4;
+  sensor5.location=LOCATION_5;
+  sensor6.location=LOCATION_6;
 }
 
 void loop()
@@ -141,13 +141,13 @@ void loop()
            update_sensor_last_contact_time();//update the last confirmed Communication time for the current_sensor
           //print recieved data and send ok http repsonse to client
            digitalWrite(0,LOW);
-           check_sensor_last_contact_time(1);//check to see if any sensors have been disconnected
-           sensor1.contact_time= String(sensor1.day) + "/" + String(sensor1.month) + "/" + String(sensor1.year) + "   "+ String(sensor1.hours) + ":" + String(sensor1.minutes) + ":" + String(sensor1.seconds);
-           check_sensor_last_contact_time(2);
-           sensor2.contact_time= String(sensor2.day) + "/" + String(sensor2.month) + "/" + String(sensor2.year) + "   "+ String(sensor2.hours) + ":" + String(sensor2.minutes) + ":" + String(sensor2.seconds);
-           check_sensor_last_contact_time(3);
-           sensor2.contact_time= String(sensor3.day) + "/" + String(sensor3.month) + "/" + String(sensor3.year) + "   "+ String(sensor3.hours) + ":" + String(sensor3.minutes) + ":" + String(sensor3.seconds);
-         if(sensor1.status=="Error"||sensor2.status=="Error"||sensor3.status=="Error"){
+           check_sensor_last_contact_time(4);//check to see if any sensors have been disconnected
+           sensor4.contact_time= String(sensor4.day) + "/" + String(sensor4.month) + "/" + String(sensor4.year) + "   "+ String(sensor4.hours) + ":" + String(sensor4.minutes) + ":" + String(sensor4.seconds);
+           check_sensor_last_contact_time(5);
+           sensor5.contact_time= String(sensor5.day) + "/" + String(sensor5.month) + "/" + String(sensor5.year) + "   "+ String(sensor5.hours) + ":" + String(sensor5.minutes) + ":" + String(sensor5.seconds);
+           check_sensor_last_contact_time(6);
+           sensor6.contact_time= String(sensor6.day) + "/" + String(sensor6.month) + "/" + String(sensor6.year) + "   "+ String(sensor6.hours) + ":" + String(sensor6.minutes) + ":" + String(sensor6.seconds);
+         if(sensor4.status=="Error"||sensor5.status=="Error"||sensor6.status=="Error"){
            digitalWrite(1,HIGH);
             }
          else{
@@ -168,95 +168,95 @@ String get_response(String url_1){//function selects correct response body, depe
   String download_file="";//string stores .csv file to be returned
   String body="";//string stores HTML code to be returned
   char data_on_file;
-  if(url_1=="sensor1"){
+  if(url_1=="sensor4"){
     http_content_type="text/html";
-    body ="<p>Latest measurements from Sensor 1</p>";
+    body ="<p>Latest measurements from Sensor 4</p>";
     body+="<table> <tr> <th> Date and Time </th> <th> Temperature (C)</th> <th> Humiditiy (Percent) </th> <th> Light (Lux) </th> <th> CO2 (ppm) </th> <th> PIR Event </th> <th> Motion Event </th> <th> Battery Voltage (V) </th></tr>";
-    body+="<tr> <td>" + sensor1.contact_time + "</td> <td>" + sensor1.temperature + "</td> <td>"+ sensor1.humidity + "</td> <td>"+ sensor1.light + "</td> <td>"+ sensor1.co2 + "</td> <td>"+ sensor1.pir_event + "</td> <td>"+ sensor1.motion_event + "</td> <td>" + sensor1.bat_volt + "</td> </tr> </table>";
-    body+="<p><a href = \'/sensor1.csv\' target= '_blank'> Click here for .csv file </a></p>";
+    body+="<tr> <td>" + sensor4.contact_time + "</td> <td>" + sensor4.temperature + "</td> <td>"+ sensor4.humidity + "</td> <td>"+ sensor4.light + "</td> <td>"+ sensor4.co2 + "</td> <td>"+ sensor4.pir_event + "</td> <td>"+ sensor4.motion_event + "</td> <td>" + sensor4.bat_volt + "</td> </tr> </table>";
+    body+="<p><a href = \'/sensor4.csv\' target= '_blank'> Click here for .csv file </a></p>";
     body+="<p><a href = \'homepage\'> Click here to go back to homepage</a></p>";
     return body;
   }
-  else if(url_1=="sensor2"){
+  else if(url_1=="sensor5"){
     http_content_type="text/html";
-    body ="<p>Latest measurement from Sensor 2</p>";
+    body ="<p>Latest measurement from Sensor 5</p>";
     body+="<table> <tr> <th> Date and Time </th> <th> Temperature (C)</th> <th> Humiditiy (Percent) </th> <th> Light (Lux) </th> <th> CO2 (ppm) </th> <th> PIR Event </th> <th> Motion Event </th> <th> Battery Voltage (V) </th> </tr>";
-    body+="<td>" + sensor2.contact_time + "</td> <td>" + sensor2.temperature + "</td> <td>"+ sensor2.humidity + "</td> <td>"+ sensor2.light + "</td> <td>"+ sensor2.co2 + "</td> <td>"+ sensor2.pir_event + "</td> <td>"+ sensor2.motion_event + "</td> <td>" + sensor2.bat_volt + "</td> </tr> </table>";
-    body+="<p><a href = \'/sensor2.csv\' target= '_blank'> Click here for .csv file </a></p>";
+    body+="<td>" + sensor5.contact_time + "</td> <td>" + sensor5.temperature + "</td> <td>"+ sensor5.humidity + "</td> <td>"+ sensor5.light + "</td> <td>"+ sensor5.co2 + "</td> <td>"+ sensor5.pir_event + "</td> <td>"+ sensor5.motion_event + "</td> <td>" + sensor5.bat_volt + "</td> </tr> </table>";
+    body+="<p><a href = \'/sensor5.csv\' target= '_blank'> Click here for .csv file </a></p>";
     body+="<p><a href = \'homepage\'> Click here to go back to homepage</a></p>";
     return body;
   }
-  else if(url_1=="sensor3"){
+  else if(url_1=="sensor6"){
     http_content_type="text/html";
-    body ="<p>Latest measurements from Sensor 3</p>";
+    body ="<p>Latest measurements from Sensor 6</p>";
     body+="<table> <tr> <th> Date and Time </th> <th> Temperature (C)</th> <th> Humiditiy (Percent) </th> <th> Light (Lux) </th> <th> CO2 (ppm) </th> <th> PIR Event </th> <th> Motion Event </th> <th> Battery Voltage (V) </th></tr>";
-    body+="<tr> <td>" + sensor3.contact_time + "</td> <td>" + sensor3.temperature + "</td> <td>"+ sensor3.humidity + "</td> <td>"+ sensor3.light + "</td> <td>"+ sensor3.co2 + "</td> <td>"+ sensor3.pir_event + "</td> <td>"+ sensor3.motion_event + "</td> <td>" + sensor3.bat_volt + "</td> </tr> </table>";
-    body+="<p><a href = \'/sensor3.csv\' target= '_blank'> Click here for .csv file </a></p>";
+    body+="<tr> <td>" + sensor6.contact_time + "</td> <td>" + sensor6.temperature + "</td> <td>"+ sensor6.humidity + "</td> <td>"+ sensor6.light + "</td> <td>"+ sensor6.co2 + "</td> <td>"+ sensor6.pir_event + "</td> <td>"+ sensor6.motion_event + "</td> <td>" + sensor6.bat_volt + "</td> </tr> </table>";
+    body+="<p><a href = \'/sensor6.csv\' target= '_blank'> Click here for .csv file </a></p>";
     body+="<p><a href = \'homepage\'> Click here to go back to homepage</a></p>";
     return body;
   }
-  else if (url_1=="sensor1.csv"){
+  else if (url_1=="sensor4.csv"){
     http_content_type="text/csv";
-    file=SD.open("sensor1.csv");
+    file=SD.open("sensor4.csv");
     if(file){
       while(file.available()){
         data_on_file=file.read();
         download_file.concat(String(data_on_file));
       }
     }
-    SD.remove("sensor1.csv");
-    create_file("sensor1.csv");
+    SD.remove("sensor4.csv");
+    create_file("sensor4.csv");
     return download_file;
   }
-  else if (url_1=="sensor2.csv"){
+  else if (url_1=="sensor5.csv"){
     http_content_type="text/csv";
-    file=SD.open("sensor2.csv");
+    file=SD.open("sensor5.csv");
     if(file){
       while(file.available()){
         data_on_file=file.read();
         download_file.concat(String(data_on_file));
       }
     }
-    SD.remove("sensor2.csv");
-    create_file("sensor2.csv");
+    SD.remove("sensor5.csv");
+    create_file("sensor5.csv");
     return download_file;
   }
-    else if (url_1=="sensor3.csv"){
+    else if (url_1=="sensor6.csv"){
     http_content_type="text/csv";
-    file=SD.open("sensor3.csv");
+    file=SD.open("sensor6.csv");
     if(file){
       while(file.available()){
         data_on_file=file.read();
         download_file.concat(String(data_on_file));
       }
     }
-    SD.remove("sensor3.csv");
-    create_file("sensor3.csv");
+    SD.remove("sensor6.csv");
+    create_file("sensor6.csv");
     return download_file;
   }
   else if (url_1==""){
     http_content_type="text/html";
     body="<p>Summary of all Sensors</p>" ;
-    body+="<p><a href = \'/sensor1\'> Click here for sensor 1 information</a></p>";
-    body+="<p><a href = \'/sensor2\'> Click here for sensor 2 information</a></p>";
-    body+="<p><a href = \'/sensor3\'> Click here for sensor 3 information</a></p>";
+    body+="<p><a href = \'/sensor4\'> Click here for sensor 4 information</a></p>";
+    body+="<p><a href = \'/sensor5\'> Click here for sensor 5 information</a></p>";
+    body+="<p><a href = \'/sensor6\'> Click here for sensor 6 information</a></p>";
     body+="<table> <tr> <th> Sensor Number </th> <th> Location </th> <th> Status </th> <th> Time of Last Communication </th> <th> Battery Voltage (V) </th> <th> File Size (B) </th> </tr>";
-    body+="<tr> <td> 1 </td> <td>" + sensor1.location + "</td> <td>" + sensor1.status + "</td> <td>" + sensor1.contact_time + "</td> <td>" + sensor1.bat_volt +"</td> <td>" + sensor1.file_size + "</td> </tr>";
-    body+="<tr> <td> 2 </td> <td>" + sensor2.location + "</td> <td>" + sensor2.status + "</td> <td>" + sensor2.contact_time + "</td> <td>" + sensor2.bat_volt +"</td> <td>" + sensor2.file_size + "</td> </tr>";
-    body+="<tr> <td> 3 </td> <td>" + sensor3.location + "</td> <td>" + sensor3.status + "</td> <td>" + sensor3.contact_time + "</td> <td>" + sensor3.bat_volt +"</td> <td>" + sensor3.file_size + "</td> </tr> </table>";
+    body+="<tr> <td> 4 </td> <td>" + sensor4.location + "</td> <td>" + sensor4.status + "</td> <td>" + sensor4.contact_time + "</td> <td>" + sensor4.bat_volt +"</td> <td>" + sensor4.file_size + "</td> </tr>";
+    body+="<tr> <td> 5 </td> <td>" + sensor5.location + "</td> <td>" + sensor5.status + "</td> <td>" + sensor5.contact_time + "</td> <td>" + sensor5.bat_volt +"</td> <td>" + sensor5.file_size + "</td> </tr>";
+    body+="<tr> <td> 6 </td> <td>" + sensor6.location + "</td> <td>" + sensor6.status + "</td> <td>" + sensor6.contact_time + "</td> <td>" + sensor6.bat_volt +"</td> <td>" + sensor6.file_size + "</td> </tr> </table>";
 
     return body;
     } 
   else if (url_1=="homepage"){
     http_content_type="text/html";
     body="<p>Summary of all Sensors</p>" ;
-    body+="<p><a href = \'/sensor1\'> Click here for sensor 1 information</a></p>";
-    body+="<p><a href = \'/sensor2\'> Click here for sensor 2 information</a></p>";
-    body+="<p><a href = \'/sensor3\'> Click here for sensor 3 information</a></p>";
+    body+="<p><a href = \'/sensor4\'> Click here for sensor 4 information</a></p>";
+    body+="<p><a href = \'/sensor5\'> Click here for sensor 5 information</a></p>";
+    body+="<p><a href = \'/sensor6\'> Click here for sensor 6 information</a></p>";
     body+="<table> <tr> <th> Sensor Number </th> <th> Location </th> <th> Status </th> <th> Time of Last Communication </th> <th> Battery Voltage (V) </th> <th> File Size (B) </th> </tr>";
-    body+="<tr> <td> 1 </td> <td>" + sensor1.location + "</td> <td>" + sensor1.status + "</td> <td>" + sensor1.contact_time + "</td> <td>" + sensor1.bat_volt +"</td> <td>" + sensor1.file_size + "</td> </tr>";
-    body+="<tr> <td> 2 </td> <td>" + sensor2.location + "</td> <td>" + sensor2.status + "</td> <td>" + sensor2.contact_time + "</td> <td>" + sensor2.bat_volt +"</td> <td>" + sensor2.file_size + "</td> </tr>";
-    body+="<tr> <td> 3 </td> <td>" + sensor3.location + "</td> <td>" + sensor3.status + "</td> <td>" + sensor3.contact_time + "</td> <td>" + sensor3.bat_volt +"</td> <td>" + sensor3.file_size + "</td> </tr> </table>";
+    body+="<tr> <td> 4 </td> <td>" + sensor4.location + "</td> <td>" + sensor4.status + "</td> <td>" + sensor4.contact_time + "</td> <td>" + sensor4.bat_volt +"</td> <td>" + sensor4.file_size + "</td> </tr>";
+    body+="<tr> <td> 5 </td> <td>" + sensor5.location + "</td> <td>" + sensor5.status + "</td> <td>" + sensor5.contact_time + "</td> <td>" + sensor5.bat_volt +"</td> <td>" + sensor5.file_size + "</td> </tr>";
+    body+="<tr> <td> 6 </td> <td>" + sensor6.location + "</td> <td>" + sensor6.status + "</td> <td>" + sensor6.contact_time + "</td> <td>" + sensor6.bat_volt +"</td> <td>" + sensor6.file_size + "</td> </tr> </table>";
     return body;
     } 
   else{
@@ -322,63 +322,60 @@ void store_data(void){
   String filename ="";//file of most recent data not sent 
   String filenameF="";//full file
   String data = "";
-  byte previous_day;
-  byte day=rtc.getDay();
+  byte minute=rtc.getMinutes();
+  byte hour=rtc.getHours();
   int sensor_number = current_sensor.number.toInt();
   switch (sensor_number)
   {
-  case 1://data recieved from sensor 1
-    filename="sensor1.csv";
-    filenameF="sensor1F.csv";
-    sensor1.temperature= String(current_sensor.temperature);
-    sensor1.humidity= String(current_sensor.humidity);
-    sensor1.light= String(current_sensor.light);
-    sensor1.co2 = String(current_sensor.co2);
-    sensor1.pir_event= String(current_sensor.pir_event);
-    sensor1.motion_event= String(current_sensor.motion_event);
-    sensor1.bat_volt=String(current_sensor.bat_volt);
-    previous_day=sensor1.day;
+  case 4://data recieved from sensor 1
+    filename="sensor4.csv";
+    filenameF="sensor4F.csv";
+    sensor4.temperature= String(current_sensor.temperature);
+    sensor4.humidity= String(current_sensor.humidity);
+    sensor4.light= String(current_sensor.light);
+    sensor4.co2 = String(current_sensor.co2);
+    sensor4.pir_event= String(current_sensor.pir_event);
+    sensor4.motion_event= String(current_sensor.motion_event);
+    sensor4.bat_volt=String(current_sensor.bat_volt);
 
     file=SD.open(filename,FILE_READ);
-    sensor1.file_size=file.size();
+    sensor4.file_size=file.size();
     file.close();
     break;
-  case 2://data recieved from sensor 2
-    filename="sensor2.csv"; 
-    filenameF="sensor2F.csv";
-    sensor2.temperature= String(current_sensor.temperature);
-    sensor2.humidity= String(current_sensor.humidity);
-    sensor2.light= String(current_sensor.light);
-    sensor2.co2 = String(current_sensor.co2);
-    sensor2.pir_event= String(current_sensor.pir_event);
-    sensor2.motion_event= String(current_sensor.motion_event);
-    sensor2.bat_volt=String(current_sensor.bat_volt);
-    previous_day=sensor2.day;
+  case 5://data recieved from sensor 2
+    filename="sensor5.csv"; 
+    filenameF="sensor5F.csv";
+    sensor5.temperature= String(current_sensor.temperature);
+    sensor5.humidity= String(current_sensor.humidity);
+    sensor5.light= String(current_sensor.light);
+    sensor5.co2 = String(current_sensor.co2);
+    sensor5.pir_event= String(current_sensor.pir_event);
+    sensor5.motion_event= String(current_sensor.motion_event);
+    sensor5.bat_volt=String(current_sensor.bat_volt);
     
     file=SD.open(filename,FILE_READ);
-    sensor2.file_size=file.size();
+    sensor5.file_size=file.size();
     file.close();
     break;
-  case 3://data recieved from sensor 3
-    filename="sensor3.csv";
-    filenameF="sensor3F.csv";
-    sensor3.temperature= String(current_sensor.temperature);
-    sensor3.humidity= String(current_sensor.humidity);
-    sensor3.light= String(current_sensor.light);
-    sensor3.co2 = String(current_sensor.co2);
-    sensor3.pir_event= String(current_sensor.pir_event);
-    sensor3.motion_event= String(current_sensor.motion_event);
-    sensor3.bat_volt=String(current_sensor.bat_volt);
-    previous_day=sensor3.day;
+  case 6://data recieved from sensor 3
+    filename="sensor6.csv";
+    filenameF="sensor6F.csv";
+    sensor6.temperature= String(current_sensor.temperature);
+    sensor6.humidity= String(current_sensor.humidity);
+    sensor6.light= String(current_sensor.light);
+    sensor6.co2 = String(current_sensor.co2);
+    sensor6.pir_event= String(current_sensor.pir_event);
+    sensor6.motion_event= String(current_sensor.motion_event);
+    sensor6.bat_volt=String(current_sensor.bat_volt);
 
     file=SD.open(filename,FILE_READ);
-    sensor3.file_size=file.size();
+    sensor6.file_size=file.size();
     file.close();
     break;
   default:
     break;
   }
-  if(day!=previous_day){
+  if((hour==23&&minute>=55)||(hour==0&&minute<5)){
     data= String(rtc.getDay()) + "/" + String(rtc.getMonth()) + "/" + String(rtc.getYear()) + ","; 
   }
   else{
@@ -425,29 +422,29 @@ void update_sensor_last_contact_time(void){
     //select currect last_contact struct
     switch (sensor_number)
     {
-    case 1:
-      sensor1.seconds=rtc.getSeconds();
-      sensor1.minutes=rtc.getMinutes();
-      sensor1.hours=rtc.getHours();
-      sensor1.day=rtc.getDay();
-      sensor1.month=rtc.getMonth();
-      sensor1.year=rtc.getYear();
+    case 4:
+      sensor4.seconds=rtc.getSeconds();
+      sensor4.minutes=rtc.getMinutes();
+      sensor4.hours=rtc.getHours();
+      sensor4.day=rtc.getDay();
+      sensor4.month=rtc.getMonth();
+      sensor4.year=rtc.getYear();
       break;
-    case 2:
-      sensor2.seconds=rtc.getSeconds();
-      sensor2.minutes=rtc.getMinutes();
-      sensor2.hours=rtc.getHours();
-      sensor2.day=rtc.getDay();
-      sensor2.month=rtc.getMonth();
-      sensor2.year=rtc.getYear();
+    case 5:
+      sensor5.seconds=rtc.getSeconds();
+      sensor5.minutes=rtc.getMinutes();
+      sensor5.hours=rtc.getHours();
+      sensor5.day=rtc.getDay();
+      sensor5.month=rtc.getMonth();
+      sensor5.year=rtc.getYear();
       break;
-    case 3:
-      sensor3.seconds=rtc.getSeconds();
-      sensor3.minutes=rtc.getMinutes();
-      sensor3.hours=rtc.getHours();
-      sensor3.day=rtc.getDay();
-      sensor3.month=rtc.getMonth();
-      sensor3.year=rtc.getYear();
+    case 6:
+      sensor6.seconds=rtc.getSeconds();
+      sensor6.minutes=rtc.getMinutes();
+      sensor6.hours=rtc.getHours();
+      sensor6.day=rtc.getDay();
+      sensor6.month=rtc.getMonth();
+      sensor6.year=rtc.getYear();
       break;
     default:
       break;
@@ -462,20 +459,20 @@ void check_sensor_last_contact_time(int sensor_number){
   String status="";
   switch (sensor_number)
   {
-  case 1:
-    last_minute=sensor1.minutes;
-    file_size=sensor1.file_size;
-    volt=sensor1.bat_volt.toFloat();
+  case 4:
+    last_minute=sensor4.minutes;
+    file_size=sensor4.file_size;
+    volt=sensor4.bat_volt.toFloat();
     break;
-  case 2:
-    last_minute=sensor2.minutes;
-    file_size=sensor2.file_size;
-    volt=sensor2.bat_volt.toFloat();
+  case 5:
+    last_minute=sensor5.minutes;
+    file_size=sensor5.file_size;
+    volt=sensor5.bat_volt.toFloat();
     break;
-  case 3:
-    last_minute=sensor3.minutes;
-    file_size=sensor3.file_size;
-    volt=sensor3.bat_volt.toFloat();
+  case 6:
+    last_minute=sensor6.minutes;
+    file_size=sensor6.file_size;
+    volt=sensor6.bat_volt.toFloat();
     break;
   default:
     break;
@@ -496,14 +493,14 @@ void check_sensor_last_contact_time(int sensor_number){
   }
  switch (sensor_number)
   {
-  case 1:
-    sensor1.status=status;
+  case 4:
+    sensor4.status=status;
     break;
-  case 2:
-    sensor2.status=status;
+  case 5:
+    sensor5.status=status;
     break;
-  case 3:
-    sensor3.status=status;
+  case 6:
+    sensor6.status=status;
     break;
   default:
     break;
