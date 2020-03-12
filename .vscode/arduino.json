@@ -2,5 +2,5 @@
     "programmer": "AVR ISP",
     "board": "arduino:samd:mkrwifi1010",
     "port": "COM14",
-    "sketch": "E:\\Uni\\Arduino\\generated_examples\\CopyFromSD\\CopyFromSD.ino"
+    "sketch": "Semester 2\\WB2\\Occupancy Tracker\\Occupancy_Tracker_v1.ino"
 }
