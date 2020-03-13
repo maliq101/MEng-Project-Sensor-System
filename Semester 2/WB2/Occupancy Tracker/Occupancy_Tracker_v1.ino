@@ -36,39 +36,68 @@ String sensor_number = SENSOR_6;//sensor number sent as http url
 int occupancy=0;
 volatile int occupancy_vol;
 int sample_time = 120000;//2 min
+
 void setup() {
   Serial.begin(9600);
   pinMode(0,OUTPUT);//RED no commincation with server
   pinMode(1,OUTPUT);//RED Low Battery
   pinMode(2,OUTPUT);//Green commincation with sensor IC
   pinMode(3,OUTPUT);//Green commincation with Server
+  pinMode(4,OUTPUT);//Green commincation with Server
 
-  pinMode(4,INPUT);
   pinMode(5,INPUT);
+  pinMode(6,INPUT);
 
-  attachInterrupt(digitalPinToInterrupt(5), increase, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(6), decrease, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(5), increase, RISING);
+  attachInterrupt(digitalPinToInterrupt(6), decrease, RISING);
   connect_to_wifi();
 }
 
 void loop() {
-  occupancy=occupancy_vol;
-  led(occupancy);
   put_request();
   delay(sample_time);
 }
 
 void led(int i){
+  if(i&0b1){
+    digitalWrite(0,HIGH);
+  }
+  else{
+    digitalWrite(0,LOW);
+  }
+  if(i&0b10){
+    digitalWrite(1,HIGH);
+  }
+  else{
+    digitalWrite(1,LOW);
+  }
+  if(i&0b100){
+    digitalWrite(2,HIGH);
+  }
+  else{
+    digitalWrite(2,LOW);
+  }
+  if(i&0b1000){
+    digitalWrite(3,HIGH);
+  }
+  else{
+    digitalWrite(3,LOW);
+  }
+  if(i&0b10000){
+    digitalWrite(4,HIGH);
+  }
+  else{
+    digitalWrite(4,LOW);
+  }
+
 }
 void connect_to_wifi(void){
   while ( wifi_status != WL_CONNECTED) {
     Serial.print("Attempting to connect to Network named: ");
     Serial.println(ssid);                   // print the network name (SSID);
-    digitalWrite(5,HIGH);
     // Connect to WPA/WPA2 network:
     wifi_status = WiFi.begin(ssid, pass);
   }
-  digitalWrite(5,LOW);
 
   // print the SSID of the network you're attached to:
   Serial.print("SSID: ");
@@ -82,13 +111,11 @@ void connect_to_wifi(void){
 }
 void reconnect_to_wifi(void){
   while ( wifi_status != WL_CONNECTED) {
-    digitalWrite(0,HIGH);
     wifi_status = WiFi.begin(ssid, pass);// Connect to WPA/WPA2 network:
   }
-  digitalWrite(0,LOW);
 }
 void put_request(){
-  Serial.println("making PUT request");
+  Serial.print("making PUT request: ");
   http_content_type = "text/plain";
   http_put_data = String(occupancy);
   if( wifi.connect(serverAddress,port)){
@@ -97,11 +124,11 @@ void put_request(){
       client.put(sensor_number, http_content_type, http_put_data);
       http_status_code = client.responseStatusCode();
       http_response = client.responseBody();
+      Serial.println("Successful");
     }
   }
   else{
     //print error message then wait 1 second  then attempt to connect to the wifi network
-    digitalWrite(5,HIGH);
     wifi_error();
     wifi.flush();
     wifi.stop();// disconnect the wifi client
@@ -140,7 +167,22 @@ void wifi_error(void){
 }
 void increase(void){
   occupancy_vol++;
+  delay(500);
+  if(occupancy!=occupancy_vol){
+    occupancy=occupancy_vol;
+    Serial.print("Occupancy is:");
+    Serial.println(occupancy);
+  }
+  led(occupancy);
+
 }
 void decrease(void){
   occupancy_vol--;
+  delay(500);
+  if(occupancy!=occupancy_vol){
+    occupancy=occupancy_vol;
+    Serial.print("Occupancy is:");
+    Serial.println(occupancy);
+  }
+  led(occupancy);
 }

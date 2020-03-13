@@ -24,11 +24,14 @@
                 "C:\\Users\\Maliq\\Documents\\Arduino\\libraries\\**",
                 "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.3\\**",
                 "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\tools\\**",
-                "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\**"
+                "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\**",
+                "C:\\Users\\Arunay\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.5\\**",
+                "C:\\Users\\Arunay\\AppData\\Local\\Arduino15\\packages\\arduino\\tools\\**"
             ],
             "forcedInclude": [
                 "C:\\Users\\Fiona\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\cores\\arduino\\Arduino.h",
-                "C:\\Users\\Maliq\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\cores\\arduino\\Arduino.h"
+                "C:\\Users\\Maliq\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.4\\cores\\arduino\\Arduino.h",
+                "C:\\Users\\Arunay\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.5\\cores\\arduino\\Arduino.h"
             ],
             "intelliSenseMode": "msvc-x64"
         }
